@@ -1,0 +1,4 @@
+Version: ImageMagick 2018-10-24 6.9.10-14 Q16 x86_64 https://imagemagick.org
+Copyright: © 1999-2018 ImageMagick Studio LLC
+License: https://imagemagick.org/script/license.php
+Features: Cipher DPC HDRI Modules OpenCL OpenMP

@@ -1,0 +1,27 @@
+
+
+
+1
+01:00:12,000 --> 01:00:15,000
+This is a subtitle.
+
+
+
+
+2
+1:02:18,010  --> 01:05:10,010
+This is some subtitle
+text that spans multiple lines.
+It includes formatting
+like <b>bold</b>, <i>italic</i>,
+<u>underline</u>, <  font color="#010101" color="#333" >
+font > color</font>, and << even <b><i><u>
+nested tags over multiple
+</u></i> lines</b><u>.
+
+3
+03:23:11,010 --> 03:55:17.110  X1:123  X2:223 Y1:50 Y2:101
+This subtitle specifies a text box
+using X1, X2, Y1, and Y2.
+
+

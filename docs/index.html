@@ -1,0 +1,1064 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+    <meta name="description" content="Need to parse something? Never heard of a parser combinator? Looking to learn some Haskell? Awesome! This is everything you'll need to get up and parsing with Haskell parser combinators. From here you can try tackling esoteric data serialization formats, compiler front ends, domain specific languages—you name it!" />
+    <meta property="og:title" content="Parsing With Haskell Parser Combinators" />
+    <meta property="og:description" content="Need to parse something? Never heard of a parser combinator? Looking to learn some Haskell? Awesome! This is everything you'll need to get up and parsing with Haskell parser combinators. From here you can try tackling esoteric data serialization formats, compiler front ends, domain specific languages—you name it!" />
+    <meta property="og:image" content="https://i.imgur.com/kw2kYzf.jpg" />
+    <meta name="twitter:title" content="Parsing With Haskell Parser Combinators" />
+    <meta name="twitter:description" content="Need to parse something? Never heard of a parser combinator? Looking to learn some Haskell? Awesome! This is everything you'll need to get up and parsing with Haskell parser combinators. From here you can try tackling esoteric data serialization formats, compiler front ends, domain specific languages—you name it!" />
+    <meta name="twitter:image" content="https://i.imgur.com/kw2kYzf.jpg" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="author" content="David Lettier" />
+    <title>Parsing With Haskell Parser Combinators</title>
+    <style>
+      code{white-space: pre-wrap;}
+      span.smallcaps{font-variant: small-caps;}
+      span.underline{text-decoration: underline;}
+      div.column{display: inline-block; vertical-align: top; width: 50%;}
+    </style>
+    <style>
+      code.sourceCode > span { display: inline-block; line-height: 1.25; }
+      code.sourceCode > span { color: inherit; text-decoration: inherit; }
+      code.sourceCode > span:empty { height: 1.2em; }
+      .sourceCode { overflow: visible; }
+      code.sourceCode { white-space: pre; position: relative; }
+      div.sourceCode { margin: 1em 0; }
+      pre.sourceCode { margin: 0; }
+      @media screen {
+      div.sourceCode { overflow: auto; }
+      }
+      @media print {
+      code.sourceCode { white-space: pre-wrap; }
+      code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+      }
+      pre.numberSource code
+        { counter-reset: source-line 0; }
+      pre.numberSource code > span
+        { position: relative; left: -4em; counter-increment: source-line; }
+      pre.numberSource code > span > a:first-child::before
+        { content: counter(source-line);
+          position: relative; left: -1em; text-align: right; vertical-align: baseline;
+          border: none; display: inline-block;
+          -webkit-touch-callout: none; -webkit-user-select: none;
+          -khtml-user-select: none; -moz-user-select: none;
+          -ms-user-select: none; user-select: none;
+          padding: 0 4px; width: 4em;
+          background-color: #232629;
+          color: #7a7c7d;
+        }
+      pre.numberSource { margin-left: 3em; border-left: 1px solid #7a7c7d;  padding-left: 4px; }
+      div.sourceCode
+        { color: #cfcfc2; background-color: #232629; }
+      @media screen {
+      code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+      }
+      code span. { color: #cfcfc2; } /* Normal */
+      code span.al { color: #95da4c; } /* Alert */
+      code span.an { color: #3f8058; } /* Annotation */
+      code span.at { color: #2980b9; } /* Attribute */
+      code span.bn { color: #f67400; } /* BaseN */
+      code span.bu { color: #7f8c8d; } /* BuiltIn */
+      code span.cf { color: #fdbc4b; } /* ControlFlow */
+      code span.ch { color: #3daee9; } /* Char */
+      code span.cn { color: #27aeae; } /* Constant */
+      code span.co { color: #7a7c7d; } /* Comment */
+      code span.cv { color: #7f8c8d; } /* CommentVar */
+      code span.do { color: #a43340; } /* Documentation */
+      code span.dt { color: #2980b9; } /* DataType */
+      code span.dv { color: #f67400; } /* DecVal */
+      code span.er { color: #da4453; } /* Error */
+      code span.ex { color: #0099ff; } /* Extension */
+      code span.fl { color: #f67400; } /* Float */
+      code span.fu { color: #8e44ad; } /* Function */
+      code span.im { color: #27ae60; } /* Import */
+      code span.in { color: #c45b00; } /* Information */
+      code span.kw { color: #cfcfc2; } /* Keyword */
+      code span.op { color: #cfcfc2; } /* Operator */
+      code span.ot { color: #27ae60; } /* Other */
+      code span.pp { color: #27ae60; } /* Preprocessor */
+      code span.re { color: #2980b9; } /* RegionMarker */
+      code span.sc { color: #3daee9; } /* SpecialChar */
+      code span.ss { color: #da4453; } /* SpecialString */
+      code span.st { color: #f44f4f; } /* String */
+      code span.va { color: #27aeae; } /* Variable */
+      code span.vs { color: #da4453; } /* VerbatimString */
+      code span.wa { color: #da4453; } /* Warning */
+    </style>
+    <!--[if lt IE 9]>
+      <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+    <![endif]-->
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+<span>
+<p align="center">
+<img alt="Parsing With Haskell Parser Combinators" src="https://i.imgur.com/hKqlZrP.gif">
+<br>
+<sup></sup>
+</p>
+</span>
+
+<h1 id="parsing-with-haskell-parser-combinators">Parsing With Haskell Parser Combinators</h1>
+<p>Need to parse something? Never heard of a "parser combinator"? Looking to learn some Haskell? Awesome! Below is everything you'll need to get up and parsing with Haskell parser combinators. From here you can try tackling esoteric data serialization formats, compiler front ends, domain specific languages—you name it!</p>
+<ul>
+<li><a href="#building-the-demos">Building The Demos</a></li>
+<li><a href="#running-the-demos">Running The Demos</a></li>
+<li><a href="#parser-combinator">Parser Combinator</a></li>
+<li><a href="#version-number">Version Number</a></li>
+<li><a href="#srt">SRT</a></li>
+<li><a href="#exercises">Exercises</a></li>
+</ul>
+<h2 id="building-the-demos">Building The Demos</h2>
+<p>Included with this guide are two demo programs.</p>
+<p><code>version-number-parser</code> parses a file for a version number. <code>srt-file-parser</code> parses a file for SRT subtitles. Feel free to try them out with the files found in <code>test-input/</code>.</p>
+<h3 id="stack">Stack</h3>
+<p>Download the Haskell tool <a href="https://docs.haskellstack.org/en/stable/README/">Stack</a> and then run the following.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1"></a><span class="fu">git</span> clone https://github.com/lettier/parsing-with-haskell-parser-combinators</span>
+<span id="cb1-2"><a href="#cb1-2"></a><span class="bu">cd</span> parsing-with-haskell-parser-combinators</span>
+<span id="cb1-3"><a href="#cb1-3"></a><span class="ex">stack</span> build</span></code></pre></div>
+<h3 id="cabal">Cabal</h3>
+<p>If using Cabal, you can run the following.</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1"></a><span class="fu">git</span> clone https://github.com/lettier/parsing-with-haskell-parser-combinators</span>
+<span id="cb2-2"><a href="#cb2-2"></a><span class="bu">cd</span> parsing-with-haskell-parser-combinators</span>
+<span id="cb2-3"><a href="#cb2-3"></a><span class="ex">cabal</span> sandbox init</span>
+<span id="cb2-4"><a href="#cb2-4"></a><span class="ex">cabal</span> --require-sandbox build</span>
+<span id="cb2-5"><a href="#cb2-5"></a><span class="ex">cabal</span> --require-sandbox install</span></code></pre></div>
+<h2 id="running-the-demos">Running The Demos</h2>
+<p>After building the two demo programs, you can run them like so.</p>
+<h3 id="stack-1">Stack</h3>
+<p>To try the version number parser, run the following.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1"></a><span class="bu">cd</span> parsing-with-haskell-parser-combinators</span>
+<span id="cb3-2"><a href="#cb3-2"></a><span class="ex">stack</span> exec -- version-number-parser</span>
+<span id="cb3-3"><a href="#cb3-3"></a><span class="ex">What</span> is the version output file path?</span>
+<span id="cb3-4"><a href="#cb3-4"></a><span class="ex">test-input/gifcurry-version-output.txt</span></span></code></pre></div>
+<p>To try the SRT file parser, run the following.</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1"></a><span class="bu">cd</span> parsing-with-haskell-parser-combinators</span>
+<span id="cb4-2"><a href="#cb4-2"></a><span class="ex">stack</span> exec -- srt-file-parser</span>
+<span id="cb4-3"><a href="#cb4-3"></a><span class="ex">What</span> is the SRT file path?</span>
+<span id="cb4-4"><a href="#cb4-4"></a><span class="ex">test-input/subtitles.srt</span></span></code></pre></div>
+<h3 id="cabal-1">Cabal</h3>
+<p>To try the version number parser, run the following.</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1"></a><span class="bu">cd</span> parsing-with-haskell-parser-combinators</span>
+<span id="cb5-2"><a href="#cb5-2"></a><span class="ex">.cabal-sandbox/bin/version-number-parser</span></span>
+<span id="cb5-3"><a href="#cb5-3"></a><span class="ex">What</span> is the version output file path?</span>
+<span id="cb5-4"><a href="#cb5-4"></a><span class="ex">test-input/gifcurry-version-output.txt</span></span></code></pre></div>
+<p>To try the SRT file parser, run the following.</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1"></a><span class="bu">cd</span> parsing-with-haskell-parser-combinators</span>
+<span id="cb6-2"><a href="#cb6-2"></a><span class="ex">.cabal-sandbox/bin/srt-file-parser</span></span>
+<span id="cb6-3"><a href="#cb6-3"></a><span class="ex">What</span> is the SRT file path?</span>
+<span id="cb6-4"><a href="#cb6-4"></a><span class="ex">test-input/subtitles.srt</span></span></code></pre></div>
+<h2 id="parser-combinator">Parser Combinator</h2>
+<span>
+<p align="center">
+<img alt="Parser Combinators" src="https://i.imgur.com/MLHPxhx.jpg">
+<br>
+<sup></sup>
+</p>
+</span>
+
+<p>One of the better ways to learn about the parsing strategy, <a href="https://en.wikipedia.org/wiki/Parser_combinator">parser combinator</a>, is to look at an implementation of one.</p>
+<blockquote>
+<p align="right">
+Parsers built using combinators are straightforward to construct, readable, modular, well-structured, and easily maintainable.
+<br><br>
+<sup>
+—<a href="https://en.wikipedia.org/wiki/Parser_combinator">Parser combinator - Wikipedia</a>
+</sup>
+</p>
+</blockquote>
+
+<h3 id="readp">ReadP</h3>
+<p>Let's take a look under the hood of <a href="https://hackage.haskell.org/package/base-4.12.0.0/docs/Text-ParserCombinators-ReadP.html">ReadP</a>, a parser combinator library found in base. Since it is in base, you should already have it.</p>
+<p><span class="emoji" data-emoji="bulb">💡</span> Note, you may want to try out <a href="https://hackage.haskell.org/package/parsec">Parsec</a> after getting familiar with ReadP. It too is a parser combinator library that others prefer to ReadP. As an added bonus, it is included in <a href="https://gitlab.haskell.org/ghc/ghc/wikis/commentary/libraries/version-history">GHC's boot libraries</a> as of GHC version 8.4.1.</p>
+<h4 id="p-data-type">P Data Type</h4>
+<div class="sourceCode" id="cb7"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb7-1"><a href="#cb7-1"></a><span class="co">-- (c) The University of Glasgow 2002</span></span>
+<span id="cb7-2"><a href="#cb7-2"></a></span>
+<span id="cb7-3"><a href="#cb7-3"></a><span class="kw">data</span> <span class="dt">P</span> a</span>
+<span id="cb7-4"><a href="#cb7-4"></a>  <span class="ot">=</span> <span class="dt">Get</span> (<span class="dt">Char</span> <span class="ot">-&gt;</span> <span class="dt">P</span> a)</span>
+<span id="cb7-5"><a href="#cb7-5"></a>  <span class="op">|</span> <span class="dt">Look</span> (<span class="dt">String</span> <span class="ot">-&gt;</span> <span class="dt">P</span> a)</span>
+<span id="cb7-6"><a href="#cb7-6"></a>  <span class="op">|</span> <span class="dt">Fail</span></span>
+<span id="cb7-7"><a href="#cb7-7"></a>  <span class="op">|</span> <span class="dt">Result</span> a (<span class="dt">P</span> a)</span>
+<span id="cb7-8"><a href="#cb7-8"></a>  <span class="op">|</span> <span class="dt">Final</span> [(a,<span class="dt">String</span>)]</span>
+<span id="cb7-9"><a href="#cb7-9"></a>  <span class="kw">deriving</span> <span class="dt">Functor</span></span></code></pre></div>
+<p>We'll start with the <code>P</code> data type. The <code>a</code> in <code>P a</code> is up to you (the library user) and can be whatever you'd like. The compiler creates a functor instance automatically and there are hand-written instances for applicative, monad, <code>MonadFail</code>, and alternative.</p>
+<p><span class="emoji" data-emoji="bulb">💡</span> Note, for more on functors, applicatives, and monads, checkout <a href="https://medium.com/@lettier/your-easy-guide-to-monads-applicatives-functors-862048d61610">Your easy guide to Monads, Applicatives, &amp; Functors</a>.</p>
+<p><code>P</code> is a <a href="https://en.wikipedia.org/wiki/Tagged_union">sum type</a> with five cases.</p>
+<ul>
+<li><code>Get</code> consumes a single character from the input string and returns a new <code>P</code>.</li>
+<li><code>Look</code> accepts a duplicate of the input string and returns a new <code>P</code>.</li>
+<li><code>Fail</code> indicates the parser finished without a result.</li>
+<li><code>Result</code> holds a possible parsing and another <code>P</code> case.</li>
+<li><code>Final</code> is a list of two-tuples. The first tuple element is a possible parsing of the input and the second tuple element is the rest of the input string that wasn't consumed by <code>Get</code>.</li>
+</ul>
+<h4 id="run">Run</h4>
+<div class="sourceCode" id="cb8"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb8-1"><a href="#cb8-1"></a><span class="co">-- (c) The University of Glasgow 2002</span></span>
+<span id="cb8-2"><a href="#cb8-2"></a></span>
+<span id="cb8-3"><a href="#cb8-3"></a><span class="ot">run ::</span> <span class="dt">P</span> a <span class="ot">-&gt;</span> <span class="dt">ReadS</span> a</span>
+<span id="cb8-4"><a href="#cb8-4"></a>run (<span class="dt">Get</span> f)      (c<span class="op">:</span>s) <span class="ot">=</span> run (f c) s</span>
+<span id="cb8-5"><a href="#cb8-5"></a>run (<span class="dt">Look</span> f)     s     <span class="ot">=</span> run (f s) s</span>
+<span id="cb8-6"><a href="#cb8-6"></a>run (<span class="dt">Result</span> x p) s     <span class="ot">=</span> (x,s) <span class="op">:</span> run p s</span>
+<span id="cb8-7"><a href="#cb8-7"></a>run (<span class="dt">Final</span> r)    _     <span class="ot">=</span> r</span>
+<span id="cb8-8"><a href="#cb8-8"></a>run _            _     <span class="ot">=</span> []</span></code></pre></div>
+<p><code>run</code> is the heart of the ReadP parser. It does all of the heavy lifting as it recursively runs through all of the parser states that we saw up above. You can see that it takes a <code>P</code> and returns a <code>ReadS</code>.</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb9-1"><a href="#cb9-1"></a><span class="co">-- (c) The University of Glasgow 2002</span></span>
+<span id="cb9-2"><a href="#cb9-2"></a></span>
+<span id="cb9-3"><a href="#cb9-3"></a><span class="kw">type</span> <span class="dt">ReadS</span> a <span class="ot">=</span> <span class="dt">String</span> <span class="ot">-&gt;</span> [(a,<span class="dt">String</span>)]</span></code></pre></div>
+<p><code>ReadS a</code> is a type alias for <code>String -&gt; [(a,String)]</code>. So whenever you see <code>ReadS a</code>, think <code>String -&gt; [(a,String)]</code>.</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb10-1"><a href="#cb10-1"></a><span class="co">-- (c) The University of Glasgow 2002</span></span>
+<span id="cb10-2"><a href="#cb10-2"></a></span>
+<span id="cb10-3"><a href="#cb10-3"></a><span class="ot">run ::</span> <span class="dt">P</span> a <span class="ot">-&gt;</span> <span class="dt">String</span> <span class="ot">-&gt;</span> [(a,<span class="dt">String</span>)]</span>
+<span id="cb10-4"><a href="#cb10-4"></a>run (<span class="dt">Get</span> f)      (c<span class="op">:</span>s) <span class="ot">=</span> run (f c) s</span>
+<span id="cb10-5"><a href="#cb10-5"></a>run (<span class="dt">Look</span> f)     s     <span class="ot">=</span> run (f s) s</span>
+<span id="cb10-6"><a href="#cb10-6"></a>run (<span class="dt">Result</span> x p) s     <span class="ot">=</span> (x,s) <span class="op">:</span> run p s</span>
+<span id="cb10-7"><a href="#cb10-7"></a>run (<span class="dt">Final</span> r)    _     <span class="ot">=</span> r</span>
+<span id="cb10-8"><a href="#cb10-8"></a>run _            _     <span class="ot">=</span> []</span></code></pre></div>
+<p><code>run</code> pattern matches the different cases of <code>P</code>.</p>
+<ul>
+<li>If it's <code>Get</code>, it calls itself with a new <code>P</code> (returned by passing the function <code>f</code>, in <code>Get f</code>, the next character <code>c</code> in the input string) and the rest of the input string <code>s</code>.</li>
+<li>If it's <code>Look</code>, it calls itself with a new <code>P</code> (returned by passing the function <code>f</code>, in <code>Look f</code>, the input string <code>s</code>) and the input string. Notice how <code>Look</code> doesn't consume any characters from the input string like <code>Get</code> does.</li>
+<li>If it's <code>Result</code>, it assembles a two-tuple—containing the parsed result and what's left of the input string—and prepends this to the result of a recursive call that runs with another <code>P</code> case and the input string.</li>
+<li>If it's <code>Final</code>, <code>run</code> returns a list of two-tuples containing parsed results and input string leftovers.</li>
+<li>For anything else, <code>run</code> returns an empty list. For example, if the case is <code>Fail</code>, <code>run</code> will return an empty list.</li>
+</ul>
+<div class="sourceCode" id="cb11"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb11-1"><a href="#cb11-1"></a><span class="op">&gt;</span> run (<span class="dt">Get</span> (\ a <span class="ot">-&gt;</span> <span class="dt">Get</span> (\ b <span class="ot">-&gt;</span> <span class="dt">Result</span> [a,b] <span class="dt">Fail</span>))) <span class="st">&quot;12345&quot;</span></span>
+<span id="cb11-2"><a href="#cb11-2"></a>[(<span class="st">&quot;12&quot;</span>,<span class="st">&quot;345&quot;</span>)]</span></code></pre></div>
+<p>ReadP doesn't expose <code>run</code> but if it did, you could call it like this. The two <code>Get</code>s consume the <code>'1'</code> and <code>'2'</code>, leaving the <code>"345"</code> behind.</p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb12-1"><a href="#cb12-1"></a><span class="op">&gt;</span> run (<span class="dt">Get</span> (\ a <span class="ot">-&gt;</span> <span class="dt">Get</span> (\ b <span class="ot">-&gt;</span> <span class="dt">Result</span> [a,b] <span class="dt">Fail</span>))) <span class="st">&quot;12345&quot;</span></span>
+<span id="cb12-2"><a href="#cb12-2"></a><span class="op">&gt;</span> run (<span class="dt">Get</span> (\ b <span class="ot">-&gt;</span> <span class="dt">Result</span> [<span class="ch">&#39;1&#39;</span>,b] <span class="dt">Fail</span>)) <span class="st">&quot;2345&quot;</span></span>
+<span id="cb12-3"><a href="#cb12-3"></a><span class="op">&gt;</span> run (<span class="dt">Result</span> [<span class="ch">&#39;1&#39;</span>,<span class="ch">&#39;2&#39;</span>] <span class="dt">Fail</span>) <span class="st">&quot;345&quot;</span></span>
+<span id="cb12-4"><a href="#cb12-4"></a><span class="op">&gt;</span> ([<span class="ch">&#39;1&#39;</span>, <span class="ch">&#39;2&#39;</span>], <span class="st">&quot;345&quot;</span>) <span class="op">:</span> run (<span class="dt">Fail</span>) <span class="st">&quot;345&quot;</span></span>
+<span id="cb12-5"><a href="#cb12-5"></a><span class="op">&gt;</span> ([<span class="ch">&#39;1&#39;</span>, <span class="ch">&#39;2&#39;</span>], <span class="st">&quot;345&quot;</span>) <span class="op">:</span> []</span>
+<span id="cb12-6"><a href="#cb12-6"></a>[(<span class="st">&quot;12&quot;</span>,<span class="st">&quot;345&quot;</span>)]</span></code></pre></div>
+<p>Running through each recursive call, you can see how we arrived at the final result.</p>
+<div class="sourceCode" id="cb13"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb13-1"><a href="#cb13-1"></a><span class="op">&gt;</span> run (<span class="dt">Get</span> (\ a <span class="ot">-&gt;</span> <span class="dt">Get</span> (\ b <span class="ot">-&gt;</span> <span class="dt">Result</span> [a,b] (<span class="dt">Final</span> [([<span class="ch">&#39;a&#39;</span>,<span class="ch">&#39;b&#39;</span>],<span class="st">&quot;c&quot;</span>)])))) <span class="st">&quot;12345&quot;</span></span>
+<span id="cb13-2"><a href="#cb13-2"></a>[(<span class="st">&quot;12&quot;</span>,<span class="st">&quot;345&quot;</span>),(<span class="st">&quot;ab&quot;</span>,<span class="st">&quot;c&quot;</span>)]</span></code></pre></div>
+<p>Using <code>Final</code>, you can include a parsed result in the final list of two-tuples.</p>
+<h4 id="readp_to_s">readP_to_S</h4>
+<div class="sourceCode" id="cb14"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb14-1"><a href="#cb14-1"></a><span class="co">-- (c) The University of Glasgow 2002</span></span>
+<span id="cb14-2"><a href="#cb14-2"></a></span>
+<span id="cb14-3"><a href="#cb14-3"></a><span class="ot">   readP_to_S ::</span> <span class="dt">ReadP</span> a <span class="ot">-&gt;</span> <span class="dt">ReadS</span> a</span>
+<span id="cb14-4"><a href="#cb14-4"></a><span class="co">-- readP_to_S :: ReadP a -&gt; String -&gt; [(a,String)]</span></span>
+<span id="cb14-5"><a href="#cb14-5"></a>   readP_to_S (<span class="dt">R</span> f) <span class="ot">=</span> run (f <span class="fu">return</span>)</span></code></pre></div>
+<p>While ReadP doesn't expose <code>run</code> directly, it does expose it via <code>readP_to_S</code>. <code>readP_to_S</code> introduces a <code>newtype</code> called <code>ReadP</code>. <code>readP_to_S</code> accepts a <code>ReadP a</code>, a string, and returns a list of two-tuples.</p>
+<h4 id="readp-newtype">ReadP Newtype</h4>
+<span>
+<p align="center">
+<img alt="ReadP Newtype" src="https://i.imgur.com/7WJPwLC.jpg">
+<br>
+<sup></sup>
+</p>
+</span>
+
+<div class="sourceCode" id="cb15"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb15-1"><a href="#cb15-1"></a><span class="co">-- (c) The University of Glasgow 2002</span></span>
+<span id="cb15-2"><a href="#cb15-2"></a></span>
+<span id="cb15-3"><a href="#cb15-3"></a><span class="kw">newtype</span> <span class="dt">ReadP</span> a <span class="ot">=</span> <span class="dt">R</span> (<span class="kw">forall</span> b <span class="op">.</span> (a <span class="ot">-&gt;</span> <span class="dt">P</span> b) <span class="ot">-&gt;</span> <span class="dt">P</span> b)</span></code></pre></div>
+<p>Here's the definition of <code>ReadP a</code>. There are instances for functor, applicative, monad, <code>MonadFail</code>, alternative, and <code>MonadPlus</code>. The <code>R</code> constructor takes a function that takes another function and returns a <code>P</code>. The accepted function takes whatever you chose for <code>a</code> and returns a <code>P</code>.</p>
+<div class="sourceCode" id="cb16"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb16-1"><a href="#cb16-1"></a><span class="co">-- (c) The University of Glasgow 2002</span></span>
+<span id="cb16-2"><a href="#cb16-2"></a></span>
+<span id="cb16-3"><a href="#cb16-3"></a>readP_to_S (<span class="dt">R</span> f) <span class="ot">=</span> run (f <span class="fu">return</span>)</span></code></pre></div>
+<p>Recall that <code>P</code> is a monad and <code>return</code>'s type is <code>a -&gt; m a</code>. So <code>f</code> is the <code>(a -&gt; P b) -&gt; Pb</code> function and <code>return</code> is the <code>(a -&gt; P b)</code> function. Ultimately, <code>run</code> gets the <code>P b</code> it expects.</p>
+<div class="sourceCode" id="cb17"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb17-1"><a href="#cb17-1"></a><span class="co">-- (c) The University of Glasgow 2002</span></span>
+<span id="cb17-2"><a href="#cb17-2"></a></span>
+<span id="cb17-3"><a href="#cb17-3"></a>readP_to_S (<span class="dt">R</span> f) inputString <span class="ot">=</span> run (f <span class="fu">return</span>) inputString</span>
+<span id="cb17-4"><a href="#cb17-4"></a><span class="co">--               ^^^^^^^^^^^                  ^^^^^^^^^^^</span></span></code></pre></div>
+<p>It's left off in the source code but remember that <code>readP_to_S</code> and <code>run</code> expects an input string.</p>
+<div class="sourceCode" id="cb18"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb18-1"><a href="#cb18-1"></a><span class="co">-- (c) The University of Glasgow 2002</span></span>
+<span id="cb18-2"><a href="#cb18-2"></a></span>
+<span id="cb18-3"><a href="#cb18-3"></a><span class="kw">instance</span> <span class="dt">Functor</span> <span class="dt">ReadP</span> <span class="kw">where</span></span>
+<span id="cb18-4"><a href="#cb18-4"></a>  <span class="fu">fmap</span> h (<span class="dt">R</span> f) <span class="ot">=</span> <span class="dt">R</span> (\k <span class="ot">-&gt;</span> f (k <span class="op">.</span> h))</span></code></pre></div>
+<p>Here's the functor instance definition for <code>ReadP</code>.</p>
+<div class="sourceCode" id="cb19"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb19-1"><a href="#cb19-1"></a><span class="op">&gt;</span> readP_to_S (<span class="fu">fmap</span> <span class="fu">toLower</span> get) <span class="st">&quot;ABC&quot;</span></span>
+<span id="cb19-2"><a href="#cb19-2"></a>[(<span class="ch">&#39;a&#39;</span>,<span class="st">&quot;BC&quot;</span>)]</span>
+<span id="cb19-3"><a href="#cb19-3"></a></span>
+<span id="cb19-4"><a href="#cb19-4"></a><span class="op">&gt;</span> readP_to_S (<span class="fu">toLower</span> <span class="op">&lt;$&gt;</span> get) <span class="st">&quot;ABC&quot;</span></span>
+<span id="cb19-5"><a href="#cb19-5"></a>[(<span class="ch">&#39;a&#39;</span>,<span class="st">&quot;BC&quot;</span>)]</span></code></pre></div>
+<p>This allows us to do something like this. <code>fmap</code> functor maps <code>toLower</code> over the functor <code>get</code> which equals <code>R Get</code>. Recall that the type of <code>Get</code> is <code>(Char -&gt; P a) -&gt; P a</code> which the <code>ReadP</code> constructor (<code>R</code>) accepts.</p>
+<div class="sourceCode" id="cb20"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb20-1"><a href="#cb20-1"></a><span class="co">-- (c) The University of Glasgow 2002</span></span>
+<span id="cb20-2"><a href="#cb20-2"></a></span>
+<span id="cb20-3"><a href="#cb20-3"></a><span class="fu">fmap</span> h       (<span class="dt">R</span> f  ) <span class="ot">=</span> <span class="dt">R</span> (\ k <span class="ot">-&gt;</span> f   (k <span class="op">.</span> h      ))</span>
+<span id="cb20-4"><a href="#cb20-4"></a><span class="fu">fmap</span> <span class="fu">toLower</span> (<span class="dt">R</span> <span class="dt">Get</span>) <span class="ot">=</span> <span class="dt">R</span> (\ k <span class="ot">-&gt;</span> <span class="dt">Get</span> (k <span class="op">.</span> <span class="fu">toLower</span>))</span></code></pre></div>
+<p>Here you see the functor definition rewritten for the <code>fmap toLower get</code> example.</p>
+<h4 id="applicative-p-instance">Applicative P Instance</h4>
+<p>Looking up above, how did <code>readP_to_S</code> return <code>[('a',"BC")]</code> when we only used <code>Get</code> which doesn't terminate <code>run</code>? The answer lies in the applicative definition for <code>P</code>.</p>
+<div class="sourceCode" id="cb21"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb21-1"><a href="#cb21-1"></a><span class="co">-- (c) The University of Glasgow 2002</span></span>
+<span id="cb21-2"><a href="#cb21-2"></a></span>
+<span id="cb21-3"><a href="#cb21-3"></a><span class="kw">instance</span> <span class="dt">Applicative</span> <span class="dt">P</span> <span class="kw">where</span></span>
+<span id="cb21-4"><a href="#cb21-4"></a>  <span class="fu">pure</span> x <span class="ot">=</span> <span class="dt">Result</span> x <span class="dt">Fail</span></span>
+<span id="cb21-5"><a href="#cb21-5"></a>  (<span class="op">&lt;*&gt;</span>) <span class="ot">=</span> ap</span></code></pre></div>
+<p><code>return</code> equals <code>pure</code> so we could rewrite <code>readP_to_S (R f) = run (f return)</code> to be <code>readP_to_S (R f) = run (f pure)</code>. By using <code>return</code> or rather <code>pure</code>, <code>readP_to_S</code> sets <code>Result x Fail</code> as the final case <code>run</code> will encounter. If reached, <code>run</code> will terminate and we'll get our list of parsings.</p>
+<div class="sourceCode" id="cb22"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb22-1"><a href="#cb22-1"></a><span class="op">&gt;</span> readP_to_S (<span class="fu">fmap</span> <span class="fu">toLower</span> get) <span class="st">&quot;ABC&quot;</span></span>
+<span id="cb22-2"><a href="#cb22-2"></a></span>
+<span id="cb22-3"><a href="#cb22-3"></a><span class="co">-- Use the functor instance to transform fmap toLower get.</span></span>
+<span id="cb22-4"><a href="#cb22-4"></a><span class="op">&gt;</span> readP_to_S (<span class="dt">R</span> (\ k <span class="ot">-&gt;</span> <span class="dt">Get</span> (k <span class="op">.</span> <span class="fu">toLower</span>))) <span class="st">&quot;ABC&quot;</span></span>
+<span id="cb22-5"><a href="#cb22-5"></a></span>
+<span id="cb22-6"><a href="#cb22-6"></a><span class="co">-- Call run which removes R.</span></span>
+<span id="cb22-7"><a href="#cb22-7"></a><span class="op">&gt;</span> run ((\ k <span class="ot">-&gt;</span> <span class="dt">Get</span> (k <span class="op">.</span> <span class="fu">toLower</span>)) <span class="fu">pure</span>) <span class="st">&quot;ABC&quot;</span></span>
+<span id="cb22-8"><a href="#cb22-8"></a></span>
+<span id="cb22-9"><a href="#cb22-9"></a><span class="co">-- Call function with pure to get rid of k.</span></span>
+<span id="cb22-10"><a href="#cb22-10"></a><span class="op">&gt;</span> run (<span class="dt">Get</span> (<span class="fu">pure</span> <span class="op">.</span> <span class="fu">toLower</span>)) <span class="st">&quot;ABC&quot;</span></span>
+<span id="cb22-11"><a href="#cb22-11"></a></span>
+<span id="cb22-12"><a href="#cb22-12"></a><span class="co">-- Call run for Get case to get rid of Get.</span></span>
+<span id="cb22-13"><a href="#cb22-13"></a><span class="op">&gt;</span> run ((<span class="fu">pure</span> <span class="op">.</span> <span class="fu">toLower</span>) <span class="ch">&#39;A&#39;</span>) <span class="st">&quot;BC&quot;</span></span>
+<span id="cb22-14"><a href="#cb22-14"></a></span>
+<span id="cb22-15"><a href="#cb22-15"></a><span class="co">-- Call toLower with &#39;A&#39; to get rid of toLower.</span></span>
+<span id="cb22-16"><a href="#cb22-16"></a><span class="op">&gt;</span> run (<span class="fu">pure</span> <span class="ch">&#39;a&#39;</span>) <span class="st">&quot;BC&quot;</span></span>
+<span id="cb22-17"><a href="#cb22-17"></a></span>
+<span id="cb22-18"><a href="#cb22-18"></a><span class="co">-- Use the applicative instance to transform pure &#39;a&#39;.</span></span>
+<span id="cb22-19"><a href="#cb22-19"></a><span class="op">&gt;</span> run (<span class="dt">Result</span> <span class="ch">&#39;a&#39;</span> <span class="dt">Fail</span>) <span class="st">&quot;BC&quot;</span></span>
+<span id="cb22-20"><a href="#cb22-20"></a></span>
+<span id="cb22-21"><a href="#cb22-21"></a><span class="co">-- Call run for the Result case to get rid of Result.</span></span>
+<span id="cb22-22"><a href="#cb22-22"></a><span class="op">&gt;</span> (<span class="ch">&#39;a&#39;</span>, <span class="st">&quot;BC&quot;</span>) <span class="op">:</span> run (<span class="dt">Fail</span>) <span class="st">&quot;BC&quot;</span></span>
+<span id="cb22-23"><a href="#cb22-23"></a></span>
+<span id="cb22-24"><a href="#cb22-24"></a><span class="co">-- Call run for the Fail case to get rid of Fail.</span></span>
+<span id="cb22-25"><a href="#cb22-25"></a><span class="op">&gt;</span> (<span class="ch">&#39;a&#39;</span>, <span class="st">&quot;BC&quot;</span>) <span class="op">:</span> []</span>
+<span id="cb22-26"><a href="#cb22-26"></a></span>
+<span id="cb22-27"><a href="#cb22-27"></a><span class="co">-- Prepend.</span></span>
+<span id="cb22-28"><a href="#cb22-28"></a>[(<span class="ch">&#39;a&#39;</span>,<span class="st">&quot;BC&quot;</span>)]</span></code></pre></div>
+<p>Here you see the flow from <code>readP_to_S</code> to the parsed result.</p>
+<h4 id="alternative-p-instance">Alternative P Instance</h4>
+<div class="sourceCode" id="cb23"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb23-1"><a href="#cb23-1"></a><span class="co">-- (c) The University of Glasgow 2002</span></span>
+<span id="cb23-2"><a href="#cb23-2"></a></span>
+<span id="cb23-3"><a href="#cb23-3"></a><span class="kw">instance</span> <span class="dt">Alternative</span> <span class="dt">P</span> <span class="kw">where</span></span>
+<span id="cb23-4"><a href="#cb23-4"></a>  <span class="co">-- ...</span></span>
+<span id="cb23-5"><a href="#cb23-5"></a></span>
+<span id="cb23-6"><a href="#cb23-6"></a>  <span class="co">-- most common case: two gets are combined</span></span>
+<span id="cb23-7"><a href="#cb23-7"></a>  <span class="dt">Get</span> f1     <span class="op">&lt;|&gt;</span> <span class="dt">Get</span> f2     <span class="ot">=</span> <span class="dt">Get</span> (\c <span class="ot">-&gt;</span> f1 c <span class="op">&lt;|&gt;</span> f2 c)</span>
+<span id="cb23-8"><a href="#cb23-8"></a></span>
+<span id="cb23-9"><a href="#cb23-9"></a>  <span class="co">-- results are delivered as soon as possible</span></span>
+<span id="cb23-10"><a href="#cb23-10"></a>  <span class="dt">Result</span> x p <span class="op">&lt;|&gt;</span> q          <span class="ot">=</span> <span class="dt">Result</span> x (p <span class="op">&lt;|&gt;</span> q)</span>
+<span id="cb23-11"><a href="#cb23-11"></a>  p          <span class="op">&lt;|&gt;</span> <span class="dt">Result</span> x q <span class="ot">=</span> <span class="dt">Result</span> x (p <span class="op">&lt;|&gt;</span> q)</span>
+<span id="cb23-12"><a href="#cb23-12"></a></span>
+<span id="cb23-13"><a href="#cb23-13"></a>  <span class="co">-- ...</span></span></code></pre></div>
+<p>The <code>Alternative</code> instance for <code>P</code> allows us to split the flow of the parser into a left and right path. This comes in handy when the input can go none, one, or (more rarely) two of two ways.</p>
+<div class="sourceCode" id="cb24"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb24-1"><a href="#cb24-1"></a><span class="op">&gt;</span> readP_to_S ((get <span class="op">&gt;&gt;=</span> \ a <span class="ot">-&gt;</span> <span class="fu">return</span> a) <span class="op">&lt;|&gt;</span> (get <span class="op">&gt;&gt;</span> get <span class="op">&gt;&gt;=</span> \ b <span class="ot">-&gt;</span> <span class="fu">return</span> b)) <span class="st">&quot;ABC&quot;</span></span>
+<span id="cb24-2"><a href="#cb24-2"></a>[(<span class="ch">&#39;A&#39;</span>,<span class="st">&quot;BC&quot;</span>),(<span class="ch">&#39;B&#39;</span>,<span class="st">&quot;C&quot;</span>)]</span></code></pre></div>
+<p>The <code>&lt;|&gt;</code> operator or function introduces a fork in the parser's flow. The parser will travel through both the left and right paths. The end result will contain all of the possible parsings that went left and all of the possible parsings that went right. If both paths fail, then the whole parser fails.</p>
+<p><span class="emoji" data-emoji="bulb">💡</span> Note, in other parser combinator implementations, when using the <code>&lt;|&gt;</code> operator, the parser will go left or right but not both. If the left succeeds, the right is ignored. The right is only processed if the left side fails.</p>
+<div class="sourceCode" id="cb25"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb25-1"><a href="#cb25-1"></a><span class="op">&gt;</span> readP_to_S ((get <span class="op">&gt;&gt;=</span> \ a <span class="ot">-&gt;</span> <span class="fu">return</span> [a]) <span class="op">&lt;|&gt;</span> look <span class="op">&lt;|&gt;</span> (get <span class="op">&gt;&gt;</span> get <span class="op">&gt;&gt;=</span> \a <span class="ot">-&gt;</span> <span class="fu">return</span> [a])) <span class="st">&quot;ABC&quot;</span></span>
+<span id="cb25-2"><a href="#cb25-2"></a>[(<span class="st">&quot;ABC&quot;</span>,<span class="st">&quot;ABC&quot;</span>),(<span class="st">&quot;A&quot;</span>,<span class="st">&quot;BC&quot;</span>),(<span class="st">&quot;B&quot;</span>,<span class="st">&quot;C&quot;</span>)]</span></code></pre></div>
+<p>You can chain the <code>&lt;|&gt;</code> operator for however many options or alternatives there are. The parser will return a possible parsing involving each.</p>
+<h4 id="readp-failure">ReadP Failure</h4>
+<div class="sourceCode" id="cb26"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb26-1"><a href="#cb26-1"></a><span class="co">-- (c) The University of Glasgow 2002</span></span>
+<span id="cb26-2"><a href="#cb26-2"></a></span>
+<span id="cb26-3"><a href="#cb26-3"></a><span class="kw">instance</span> <span class="dt">Monad</span> <span class="dt">ReadP</span> <span class="kw">where</span></span>
+<span id="cb26-4"><a href="#cb26-4"></a>  <span class="fu">fail</span> _    <span class="ot">=</span> <span class="dt">R</span> (\_ <span class="ot">-&gt;</span> <span class="dt">Fail</span>)</span>
+<span id="cb26-5"><a href="#cb26-5"></a>  <span class="dt">R</span> m <span class="op">&gt;&gt;=</span> f <span class="ot">=</span> <span class="dt">R</span> (\k <span class="ot">-&gt;</span> m (\a <span class="ot">-&gt;</span> <span class="kw">let</span> <span class="dt">R</span> m&#39; <span class="ot">=</span> f a <span class="kw">in</span> m&#39; k))</span></code></pre></div>
+<p>Here is the <code>ReadP</code> monad instance. Notice the definition for <code>fail</code>.</p>
+<div class="sourceCode" id="cb27"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb27-1"><a href="#cb27-1"></a><span class="op">&gt;</span> readP_to_S ((\ a b c <span class="ot">-&gt;</span> [a,b,c]) <span class="op">&lt;$&gt;</span> get <span class="op">&lt;*&gt;</span> get <span class="op">&lt;*&gt;</span> get) <span class="st">&quot;ABC&quot;</span></span>
+<span id="cb27-2"><a href="#cb27-2"></a>[(<span class="st">&quot;ABC&quot;</span>,<span class="st">&quot;&quot;</span>)]</span>
+<span id="cb27-3"><a href="#cb27-3"></a></span>
+<span id="cb27-4"><a href="#cb27-4"></a><span class="op">&gt;</span> readP_to_S ((\ a b c <span class="ot">-&gt;</span> [a,b,c]) <span class="op">&lt;$&gt;</span> get <span class="op">&lt;*&gt;</span> <span class="fu">fail</span> <span class="st">&quot;&quot;</span> <span class="op">&lt;*&gt;</span> get) <span class="st">&quot;ABC&quot;</span></span>
+<span id="cb27-5"><a href="#cb27-5"></a>[]</span>
+<span id="cb27-6"><a href="#cb27-6"></a></span>
+<span id="cb27-7"><a href="#cb27-7"></a><span class="op">&gt;</span> readP_to_S (get <span class="op">&gt;&gt;=</span> \ a <span class="ot">-&gt;</span> get <span class="op">&gt;&gt;=</span> \ b <span class="ot">-&gt;</span> get <span class="op">&gt;&gt;=</span> \ c <span class="ot">-&gt;</span> <span class="fu">return</span> [a,b,c]) <span class="st">&quot;ABC&quot;</span></span>
+<span id="cb27-8"><a href="#cb27-8"></a>[(<span class="st">&quot;ABC&quot;</span>,<span class="st">&quot;&quot;</span>)]</span>
+<span id="cb27-9"><a href="#cb27-9"></a></span>
+<span id="cb27-10"><a href="#cb27-10"></a><span class="op">&gt;</span> readP_to_S (get <span class="op">&gt;&gt;=</span> \ a <span class="ot">-&gt;</span> get <span class="op">&gt;&gt;=</span> \ b <span class="ot">-&gt;</span> <span class="fu">fail</span> <span class="st">&quot;&quot;</span> <span class="op">&gt;&gt;=</span> \ c <span class="ot">-&gt;</span> <span class="fu">return</span> [a,b,c]) <span class="st">&quot;ABC&quot;</span></span>
+<span id="cb27-11"><a href="#cb27-11"></a>[]</span></code></pre></div>
+<p>You can cause an entire parser path to abort by calling <code>fail</code>. Since ReadP doesn't provide a direct way to generate a <code>Result</code> or <code>Final</code> case, the return value will be an empty list. If the failed path is the only path, then the entire result will be an empty list. Recall that when <code>run</code> matches <code>Fail</code>, it returns an empty list.</p>
+<div class="sourceCode" id="cb28"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb28-1"><a href="#cb28-1"></a><span class="co">-- (c) The University of Glasgow 2002</span></span>
+<span id="cb28-2"><a href="#cb28-2"></a></span>
+<span id="cb28-3"><a href="#cb28-3"></a><span class="kw">instance</span> <span class="dt">Alternative</span> <span class="dt">P</span> <span class="kw">where</span></span>
+<span id="cb28-4"><a href="#cb28-4"></a>  <span class="co">-- ...</span></span>
+<span id="cb28-5"><a href="#cb28-5"></a></span>
+<span id="cb28-6"><a href="#cb28-6"></a>  <span class="co">-- fail disappears</span></span>
+<span id="cb28-7"><a href="#cb28-7"></a>  <span class="dt">Fail</span>       <span class="op">&lt;|&gt;</span> p          <span class="ot">=</span> p</span>
+<span id="cb28-8"><a href="#cb28-8"></a>  p          <span class="op">&lt;|&gt;</span> <span class="dt">Fail</span>       <span class="ot">=</span> p</span>
+<span id="cb28-9"><a href="#cb28-9"></a></span>
+<span id="cb28-10"><a href="#cb28-10"></a>  <span class="co">-- ...</span></span></code></pre></div>
+<p>Going back to the alternative <code>P</code> instance, you can see how a failure on either side (but not both) will not fail the whole parser.</p>
+<div class="sourceCode" id="cb29"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb29-1"><a href="#cb29-1"></a><span class="op">&gt;</span> readP_to_S (get <span class="op">&gt;&gt;=</span> \ a <span class="ot">-&gt;</span> get <span class="op">&gt;&gt;=</span> \ b <span class="ot">-&gt;</span> pfail <span class="op">&gt;&gt;=</span> \ c <span class="ot">-&gt;</span> <span class="fu">return</span> [a,b,c]) <span class="st">&quot;ABC&quot;</span></span>
+<span id="cb29-2"><a href="#cb29-2"></a>[]</span></code></pre></div>
+<p>Instead of using <code>fail</code>, ReadP provides <code>pfail</code> which allows you to generate a <code>Fail</code> case directly.</p>
+<h2 id="version-number">Version Number</h2>
+<span>
+<p align="center">
+<img alt="Version Number" src="https://i.imgur.com/mHnqDjf.jpg">
+<br>
+<sup></sup>
+</p>
+</span>
+
+<p><a href="https://github.com/lettier/gifcurry">Gifcurry</a>, the Haskell-built video editor for GIF makers, shells out to various different programs. To ensure compatibility, it needs the version number for each of the programs it shells out to. One of those programs is ImageMagick.</p>
+<div class="sourceCode" id="cb30"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb30-1"><a href="#cb30-1"></a><span class="ex">Version</span>: ImageMagick 6.9.10-14 Q16 x86_64 2018-10-24 https://imagemagick.org</span>
+<span id="cb30-2"><a href="#cb30-2"></a><span class="ex">Copyright</span>: © 1999-2018 ImageMagick Studio LLC</span>
+<span id="cb30-3"><a href="#cb30-3"></a><span class="ex">License</span>: https://imagemagick.org/script/license.php</span>
+<span id="cb30-4"><a href="#cb30-4"></a><span class="ex">Features</span>: Cipher DPC HDRI Modules OpenCL OpenMP</span></code></pre></div>
+<p>Here you see the output of <code>convert --version</code>. How could you parse this to capture the 6, 9, 10, and 14?</p>
+<p>Looking at the output, we know the version number is a collection of numbers separated by either a period or a dash. This definition covers the dates as well so we'll make sure that the first two numbers are separated by a period. That way, if they put a date before the version number, we won't get the wrong result.</p>
+<span>
+<p align="center">
+<img alt="Version Number Parser" src="https://i.imgur.com/3hZDOpI.gif">
+<br>
+<sup></sup>
+</p>
+</span>
+
+<div class="sourceCode" id="cb31"><pre class="sourceCode txt"><code class="sourceCode default"><span id="cb31-1"><a href="#cb31-1"></a>1. Consume zero or more characters that are not 0 through 9 and go to 2.</span>
+<span id="cb31-2"><a href="#cb31-2"></a>2. Consume zero or more characters that are 0 through 9, save this number, and go to 3.</span>
+<span id="cb31-3"><a href="#cb31-3"></a>3. Look at the rest of the input and go to 4.</span>
+<span id="cb31-4"><a href="#cb31-4"></a>4. If the input</span>
+<span id="cb31-5"><a href="#cb31-5"></a>    - is empty, go to 6.</span>
+<span id="cb31-6"><a href="#cb31-6"></a>    - starts with a period, go to 1.</span>
+<span id="cb31-7"><a href="#cb31-7"></a>    - starts with a dash</span>
+<span id="cb31-8"><a href="#cb31-8"></a>        - and you have exactly one number, go to 5.</span>
+<span id="cb31-9"><a href="#cb31-9"></a>        - and you have more than one number, go to 1.</span>
+<span id="cb31-10"><a href="#cb31-10"></a>    - doesn&#39;t start with a period or dash</span>
+<span id="cb31-11"><a href="#cb31-11"></a>        - and you have exactly one number, go to 5.</span>
+<span id="cb31-12"><a href="#cb31-12"></a>        - you have more than one number, go to 6.</span>
+<span id="cb31-13"><a href="#cb31-13"></a>5. Delete any saved numbers and go to 1.</span>
+<span id="cb31-14"><a href="#cb31-14"></a>6. Return the numbers found.</span></code></pre></div>
+<p>Before we dive into the code, here's the algorithm we'll be following.</p>
+<h3 id="building-the-version-number-parser">Building The Version Number Parser</h3>
+<div class="sourceCode" id="cb32"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb32-1"><a href="#cb32-1"></a>parseVersionNumber</span>
+<span id="cb32-2"><a href="#cb32-2"></a><span class="ot">  ::</span>  [<span class="dt">String</span>]</span>
+<span id="cb32-3"><a href="#cb32-3"></a>  <span class="ot">-&gt;</span>  <span class="dt">ReadP</span> [<span class="dt">String</span>]</span>
+<span id="cb32-4"><a href="#cb32-4"></a>parseVersionNumber</span>
+<span id="cb32-5"><a href="#cb32-5"></a>  nums</span>
+<span id="cb32-6"><a href="#cb32-6"></a>  <span class="ot">=</span> <span class="kw">do</span></span>
+<span id="cb32-7"><a href="#cb32-7"></a>  _         <span class="ot">&lt;-</span> parseNotNumber</span>
+<span id="cb32-8"><a href="#cb32-8"></a>  num       <span class="ot">&lt;-</span> parseNumber</span>
+<span id="cb32-9"><a href="#cb32-9"></a>  <span class="kw">let</span> nums&#39; <span class="ot">=</span> nums <span class="op">++</span> [num]</span>
+<span id="cb32-10"><a href="#cb32-10"></a>  parseSeparator nums&#39; parseVersionNumber</span></code></pre></div>
+<p><code>parseVersionNumber</code> is the main parser combinator that parses an input string for a version number. It accepts a list of strings and returns a list of strings in the context of the <code>ReadP</code> data type. The accepted list of strings is not the input that gets parsed but rather the list of numbers found so far. For the first function call, the list is empty since it hasn't parsed anything yet.</p>
+<div class="sourceCode" id="cb33"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb33-1"><a href="#cb33-1"></a>parseVersionNumber</span>
+<span id="cb33-2"><a href="#cb33-2"></a>  nums</span></code></pre></div>
+<p>Starting from the top, <code>parseVersionNumber</code> takes a list of strings which are the current list of numbers found so far.</p>
+<div class="sourceCode" id="cb34"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb34-1"><a href="#cb34-1"></a>  _         <span class="ot">&lt;-</span> parseNotNumber</span></code></pre></div>
+<p><code>parseNotNumber</code> consumes everything that isn't a number from the input string. Since we are not interested in the result, we discard it (<code>_ &lt;-</code>).</p>
+<div class="sourceCode" id="cb35"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb35-1"><a href="#cb35-1"></a>  num       <span class="ot">&lt;-</span> parseNumber</span>
+<span id="cb35-2"><a href="#cb35-2"></a>  <span class="kw">let</span> nums&#39; <span class="ot">=</span> nums <span class="op">++</span> [num]</span></code></pre></div>
+<p>Next we consume everything that is a number and then add that to the list of numbers found so far.</p>
+<div class="sourceCode" id="cb36"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb36-1"><a href="#cb36-1"></a>  parseSeparator nums&#39; parseVersionNumber</span></code></pre></div>
+<p>After <code>parseVersionNumber</code> has processed the next number, it passes the list of numbers found and itself to <code>parseSeparator</code>.</p>
+<h4 id="parsing-the-separator">Parsing The Separator</h4>
+<div class="sourceCode" id="cb37"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb37-1"><a href="#cb37-1"></a>parseSeparator</span>
+<span id="cb37-2"><a href="#cb37-2"></a><span class="ot">  ::</span>  [<span class="dt">String</span>]</span>
+<span id="cb37-3"><a href="#cb37-3"></a>  <span class="ot">-&gt;</span>  ([<span class="dt">String</span>] <span class="ot">-&gt;</span> <span class="dt">ReadP</span> [<span class="dt">String</span>])</span>
+<span id="cb37-4"><a href="#cb37-4"></a>  <span class="ot">-&gt;</span>  <span class="dt">ReadP</span> [<span class="dt">String</span>]</span>
+<span id="cb37-5"><a href="#cb37-5"></a>parseSeparator</span>
+<span id="cb37-6"><a href="#cb37-6"></a>  nums</span>
+<span id="cb37-7"><a href="#cb37-7"></a>  f</span>
+<span id="cb37-8"><a href="#cb37-8"></a>  <span class="ot">=</span> <span class="kw">do</span></span>
+<span id="cb37-9"><a href="#cb37-9"></a>  next <span class="ot">&lt;-</span> look</span>
+<span id="cb37-10"><a href="#cb37-10"></a>  <span class="kw">case</span> next <span class="kw">of</span></span>
+<span id="cb37-11"><a href="#cb37-11"></a>    <span class="st">&quot;&quot;</span>    <span class="ot">-&gt;</span> <span class="fu">return</span> nums</span>
+<span id="cb37-12"><a href="#cb37-12"></a>    (c<span class="op">:</span>_) <span class="ot">-&gt;</span></span>
+<span id="cb37-13"><a href="#cb37-13"></a>      <span class="kw">case</span> c <span class="kw">of</span></span>
+<span id="cb37-14"><a href="#cb37-14"></a>        <span class="ch">&#39;.&#39;</span> <span class="ot">-&gt;</span> f nums</span>
+<span id="cb37-15"><a href="#cb37-15"></a>        <span class="ch">&#39;-&#39;</span> <span class="ot">-&gt;</span> <span class="kw">if</span> <span class="fu">length</span> nums <span class="op">==</span> <span class="dv">1</span> <span class="kw">then</span> f [] <span class="kw">else</span> f nums</span>
+<span id="cb37-16"><a href="#cb37-16"></a>        _   <span class="ot">-&gt;</span> <span class="kw">if</span> <span class="fu">length</span> nums <span class="op">==</span> <span class="dv">1</span> <span class="kw">then</span> f [] <span class="kw">else</span> <span class="fu">return</span> nums</span></code></pre></div>
+<p>Here you see <code>parseSeparator</code>.</p>
+<div class="sourceCode" id="cb38"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb38-1"><a href="#cb38-1"></a>  next <span class="ot">&lt;-</span> look</span>
+<span id="cb38-2"><a href="#cb38-2"></a>  <span class="kw">case</span> next <span class="kw">of</span></span>
+<span id="cb38-3"><a href="#cb38-3"></a>    <span class="st">&quot;&quot;</span>    <span class="ot">-&gt;</span> <span class="fu">return</span> nums</span>
+<span id="cb38-4"><a href="#cb38-4"></a>    (c<span class="op">:</span>_) <span class="ot">-&gt;</span></span></code></pre></div>
+<p><code>look</code> allows us to get what's left of the input string without consuming it. If there's nothing left, it returns the numbers found. However, if there is something left, it analyzes the first character.</p>
+<div class="sourceCode" id="cb39"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb39-1"><a href="#cb39-1"></a>      <span class="kw">case</span> c <span class="kw">of</span></span>
+<span id="cb39-2"><a href="#cb39-2"></a>        <span class="ch">&#39;.&#39;</span> <span class="ot">-&gt;</span> f nums</span>
+<span id="cb39-3"><a href="#cb39-3"></a>        <span class="ch">&#39;-&#39;</span> <span class="ot">-&gt;</span> <span class="kw">if</span> <span class="fu">length</span> nums <span class="op">==</span> <span class="dv">1</span> <span class="kw">then</span> f [] <span class="kw">else</span> f nums</span>
+<span id="cb39-4"><a href="#cb39-4"></a>        _   <span class="ot">-&gt;</span> <span class="kw">if</span> <span class="fu">length</span> nums <span class="op">==</span> <span class="dv">1</span> <span class="kw">then</span> f [] <span class="kw">else</span> <span class="fu">return</span> nums</span></code></pre></div>
+<p>If the next character is a period, call <code>parseVersionNumber</code> again with the current list of numbers found. If it's a dash and we have exactly one number, call <code>parseVersionNumber</code> with an empty list of numbers since it's a date. If it's a dash and we don't have exactly one number, call <code>parseVersionNumber</code> with the list of numbers found so far. Otherwise, call <code>parseVersionNumber</code> with an empty list if we have exactly one number or return the numbers found if we don't have exactly one number.</p>
+<h4 id="parsing-non-numbers">Parsing Non-numbers</h4>
+<div class="sourceCode" id="cb40"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb40-1"><a href="#cb40-1"></a>parseNotNumber</span>
+<span id="cb40-2"><a href="#cb40-2"></a><span class="ot">  ::</span>  <span class="dt">ReadP</span> <span class="dt">String</span></span>
+<span id="cb40-3"><a href="#cb40-3"></a>parseNotNumber</span>
+<span id="cb40-4"><a href="#cb40-4"></a>  <span class="ot">=</span></span>
+<span id="cb40-5"><a href="#cb40-5"></a>  munch (<span class="fu">not</span> <span class="op">.</span> isNumber)</span></code></pre></div>
+<p><code>parseNotNumber</code> uses <code>munch</code> which <code>ReadP</code> provides. <code>munch</code> is given the predicate <code>(not . isNumber)</code> which returns true for any character that isn't 0 through 9.</p>
+<div class="sourceCode" id="cb41"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb41-1"><a href="#cb41-1"></a><span class="ot">munch ::</span> (<span class="dt">Char</span> <span class="ot">-&gt;</span> <span class="dt">Bool</span>) <span class="ot">-&gt;</span> <span class="dt">ReadP</span> <span class="dt">String</span></span></code></pre></div>
+<p><code>munch</code> continuously calls <code>get</code> if the next character in the input string satisfies the predicate. If it doesn't, <code>munch</code> returns the characters that did, if any. Since it only uses <code>get</code>, munch always succeeds.</p>
+<p><span class="emoji" data-emoji="bulb">💡</span> Note, <code>parseNumber</code> is similar to <code>parseNotNumber</code>. Instead of <code>not . isNumber</code>, the predicate is just <code>isNumber</code>.</p>
+<h4 id="munch-versus-many">Munch Versus Many</h4>
+<div class="sourceCode" id="cb42"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb42-1"><a href="#cb42-1"></a>parseNotNumber&#39;</span>
+<span id="cb42-2"><a href="#cb42-2"></a><span class="ot">  ::</span>  <span class="dt">ReadP</span> <span class="dt">String</span></span>
+<span id="cb42-3"><a href="#cb42-3"></a>parseNotNumber&#39;</span>
+<span id="cb42-4"><a href="#cb42-4"></a>  <span class="ot">=</span></span>
+<span id="cb42-5"><a href="#cb42-5"></a>  many (satisfy (<span class="fu">not</span> <span class="op">.</span> isNumber))</span></code></pre></div>
+<p>Instead of using <code>munch</code>, you could write <code>parseNotNumber</code> like this, using <code>many</code> and <code>satisfy</code>—both of which ReadP provides. Looking at the type signature for <code>many</code>, it accepts a single parser combinator (<code>ReadP a</code>). In this instance, it's being given the parser combinator <code>satisfy</code>.</p>
+<div class="sourceCode" id="cb43"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb43-1"><a href="#cb43-1"></a><span class="op">&gt;</span> readP_to_S (satisfy (<span class="fu">not</span> <span class="op">.</span> isNumber)) <span class="st">&quot;a&quot;</span></span>
+<span id="cb43-2"><a href="#cb43-2"></a>[(<span class="ch">&#39;a&#39;</span>,<span class="st">&quot;&quot;</span>)]</span>
+<span id="cb43-3"><a href="#cb43-3"></a></span>
+<span id="cb43-4"><a href="#cb43-4"></a><span class="op">&gt;</span> readP_to_S (satisfy (<span class="fu">not</span> <span class="op">.</span> isNumber)) <span class="st">&quot;1&quot;</span></span>
+<span id="cb43-5"><a href="#cb43-5"></a>[]</span></code></pre></div>
+<p><code>satisfy</code> takes a predicate and uses <code>get</code> to consume the next character. If the accepted predicate returns true, <code>satisfy</code> returns the character. Otherwise, <code>satisfy</code> calls <code>pfail</code> and fails.</p>
+<div class="sourceCode" id="cb44"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb44-1"><a href="#cb44-1"></a><span class="op">&gt;</span> readP_to_S (munch (<span class="fu">not</span> <span class="op">.</span> isNumber)) <span class="st">&quot;abc123&quot;</span></span>
+<span id="cb44-2"><a href="#cb44-2"></a>[(<span class="st">&quot;abc&quot;</span>,<span class="st">&quot;123&quot;</span>)]</span>
+<span id="cb44-3"><a href="#cb44-3"></a></span>
+<span id="cb44-4"><a href="#cb44-4"></a><span class="op">&gt;</span> readP_to_S (many (satisfy (<span class="fu">not</span> <span class="op">.</span> isNumber))) <span class="st">&quot;abc123&quot;</span></span>
+<span id="cb44-5"><a href="#cb44-5"></a>[(<span class="st">&quot;&quot;</span>,<span class="st">&quot;abc123&quot;</span>),(<span class="st">&quot;a&quot;</span>,<span class="st">&quot;bc123&quot;</span>),(<span class="st">&quot;ab&quot;</span>,<span class="st">&quot;c123&quot;</span>),(<span class="st">&quot;abc&quot;</span>,<span class="st">&quot;123&quot;</span>)]</span></code></pre></div>
+<p>Using <code>many</code> can give you unwanted results. Ultimately, <code>many</code> introduces one or more <code>Result</code> cases. Because of this, <code>many</code> always succeeds.</p>
+<div class="sourceCode" id="cb45"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb45-1"><a href="#cb45-1"></a><span class="op">&gt;</span> readP_to_S (many look) <span class="st">&quot;abc123&quot;</span></span>
+<span id="cb45-2"><a href="#cb45-2"></a><span class="co">-- Runs forever.</span></span></code></pre></div>
+<p><code>many</code> will run your parser until it fails or runs out of input. If your parser never fails or never runs out of input, <code>many</code> will never return.</p>
+<div class="sourceCode" id="cb46"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb46-1"><a href="#cb46-1"></a><span class="op">&gt;</span> readP_to_S (many (get <span class="op">&gt;&gt;=</span> \ a <span class="ot">-&gt;</span> <span class="fu">return</span> (<span class="fu">read</span> (a <span class="op">:</span> <span class="st">&quot;&quot;</span>)<span class="ot"> ::</span> <span class="dt">Int</span>))) <span class="st">&quot;12345&quot;</span></span>
+<span id="cb46-2"><a href="#cb46-2"></a>[([],<span class="st">&quot;12345&quot;</span>),([<span class="dv">1</span>],<span class="st">&quot;2345&quot;</span>),([<span class="dv">1</span>,<span class="dv">2</span>],<span class="st">&quot;345&quot;</span>),([<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">3</span>],<span class="st">&quot;45&quot;</span>),([<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">3</span>,<span class="dv">4</span>],<span class="st">&quot;5&quot;</span>),([<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">3</span>,<span class="dv">4</span>,<span class="dv">5</span>],<span class="st">&quot;&quot;</span>)]</span></code></pre></div>
+<p>For every index in the result, the parsed result will be the outcome of having ran the parser index times on the entire input.</p>
+<div class="sourceCode" id="cb47"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb47-1"><a href="#cb47-1"></a><span class="op">&gt;</span> <span class="kw">let</span> parser        <span class="ot">=</span> get <span class="op">&gt;&gt;=</span> \ a <span class="ot">-&gt;</span> <span class="fu">return</span> (<span class="fu">read</span> (a <span class="op">:</span> <span class="st">&quot;&quot;</span>)<span class="ot"> ::</span> <span class="dt">Int</span>)</span>
+<span id="cb47-2"><a href="#cb47-2"></a><span class="op">&gt;</span> <span class="kw">let</span> many&#39; results <span class="ot">=</span> <span class="fu">return</span> results <span class="op">&lt;|&gt;</span> (parser <span class="op">&gt;&gt;=</span> \ result <span class="ot">-&gt;</span> many&#39; (results <span class="op">++</span> [result]))</span>
+<span id="cb47-3"><a href="#cb47-3"></a><span class="op">&gt;</span> readP_to_S (many&#39; []) <span class="st">&quot;12345&quot;</span></span>
+<span id="cb47-4"><a href="#cb47-4"></a>[([],<span class="st">&quot;12345&quot;</span>),([<span class="dv">1</span>],<span class="st">&quot;2345&quot;</span>),([<span class="dv">1</span>,<span class="dv">2</span>],<span class="st">&quot;345&quot;</span>),([<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">3</span>],<span class="st">&quot;45&quot;</span>),([<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">3</span>,<span class="dv">4</span>],<span class="st">&quot;5&quot;</span>),([<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">3</span>,<span class="dv">4</span>,<span class="dv">5</span>],<span class="st">&quot;&quot;</span>)]</span></code></pre></div>
+<p>Here's an alternate definition for <code>many</code>. On the left side of <code>&lt;|&gt;</code>, it returns the current parser results. On the right side of <code>&lt;|&gt;</code>, it runs the parser, adds that result to the current parser results, and calls itself with the updated results. This has a cumulative sum type effect where index <code>i</code> is the parser result appended to the parser result at <code>i - 1</code>, <code>i - 2</code>, ..., and <code>1</code>.</p>
+<h3 id="running-the-version-number-parser">Running The Version Number Parser</h3>
+<p>Now that we built the parser, let's run it.</p>
+<div class="sourceCode" id="cb48"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb48-1"><a href="#cb48-1"></a><span class="op">&gt;</span> <span class="kw">let</span> inputString <span class="ot">=</span></span>
+<span id="cb48-2"><a href="#cb48-2"></a><span class="op">&gt;</span>     <span class="st">&quot;Some Program (C) 1234-56-78 All rights reserved.\n\</span></span>
+<span id="cb48-3"><a href="#cb48-3"></a><span class="st">&gt;     \Version: 12.345.6-7\n\</span></span>
+<span id="cb48-4"><a href="#cb48-4"></a><span class="st">&gt;     \License: Some open source license.&quot;</span></span>
+<span id="cb48-5"><a href="#cb48-5"></a><span class="op">&gt;</span> readP_to_S (parseVersionNumber []) inputString</span>
+<span id="cb48-6"><a href="#cb48-6"></a>[([<span class="st">&quot;12&quot;</span>,<span class="st">&quot;345&quot;</span>,<span class="st">&quot;6&quot;</span>,<span class="st">&quot;7&quot;</span>],<span class="st">&quot;\nLicense: Some open source license.&quot;</span>)]</span></code></pre></div>
+<p>You can see it extracted the version number correctly even with the date coming before it.</p>
+<h2 id="srt">SRT</h2>
+<span>
+<p align="center">
+<img alt="SRT" src="https://i.imgur.com/pMTs3AB.jpg">
+<br>
+<sup></sup>
+</p>
+</span>
+
+<p>Now let's parse something more complicated—SRT files.</p>
+<p>For the release of <a href="https://lettier.github.io/gifcurry">Gifcurry</a> six, I needed to parse <a href="http://www.visualsubsync.org/help/srt">SRT (SubRip Text) files</a>. SRT files contain subtitles that video processing programs use to display text on top of a video. Typically this text is the dialog of a movie translated into various different languages. By keeping the text separate from the video, there only needs to be one video which saves time, storage space, and bandwidth. The video software can swap out the text without having to swap out the video. Contrast this with burning-in or hard-coding the subtitles where the text becomes a part of the image data that makes up the video. In this case, you would need a video for each collection of subtitles.</p>
+<span>
+<p align="center">
+<img alt="Gifcurry" src="https://i.imgur.com/RUwM8eE.gif">
+<br>
+<sup>Inner Video © Blender Foundation | www.sintel.org</sup>
+</p>
+</span>
+
+<p>Gifcurry can take a SRT file and burn-in the subtitles for the video slice your select.</p>
+<div class="sourceCode" id="cb49"><pre class="sourceCode txt"><code class="sourceCode default"><span id="cb49-1"><a href="#cb49-1"></a>7</span>
+<span id="cb49-2"><a href="#cb49-2"></a>00:02:09,400 --&gt; 00:02:13,800</span>
+<span id="cb49-3"><a href="#cb49-3"></a>What brings you to</span>
+<span id="cb49-4"><a href="#cb49-4"></a>the land of the gatekeepers?</span>
+<span id="cb49-5"><a href="#cb49-5"></a></span>
+<span id="cb49-6"><a href="#cb49-6"></a>8</span>
+<span id="cb49-7"><a href="#cb49-7"></a>00:02:15,000 --&gt; 00:02:17,500</span>
+<span id="cb49-8"><a href="#cb49-8"></a>I&#39;m searching for someone.</span>
+<span id="cb49-9"><a href="#cb49-9"></a></span>
+<span id="cb49-10"><a href="#cb49-10"></a>9</span>
+<span id="cb49-11"><a href="#cb49-11"></a>00:02:18,000 --&gt; 00:02:22,200</span>
+<span id="cb49-12"><a href="#cb49-12"></a>Someone very dear?</span>
+<span id="cb49-13"><a href="#cb49-13"></a>A kindred spirit?</span></code></pre></div>
+<p>Here you see the English subtitles for <a href="https://durian.blender.org/">Sintel</a> (© Blender Foundation | <a href="http://www.sintel.org">www.sintel.org</a>).</p>
+<h3 id="srt-format">SRT Format</h3>
+<blockquote>
+<p align="right">
+SRT is perhaps the most basic of all subtitle formats.
+<br><br>
+<sup>
+—<a href="https://matroska.org/technical/specs/subtitles/srt.html">SRT Subtitle | Matrosk</a>
+</sup>
+</p>
+</blockquote>
+
+<p>The SRT file format consists of blocks, one for each subtitle, separated by an empty line.</p>
+<div class="sourceCode" id="cb50"><pre class="sourceCode txt"><code class="sourceCode default"><span id="cb50-1"><a href="#cb50-1"></a>2</span></code></pre></div>
+<p>At the top of the block is the index. This determines the order of the subtitles. Hopefully the subtitles are already in order and all of them have unique indexes but this may not be the case.</p>
+<div class="sourceCode" id="cb51"><pre class="sourceCode txt"><code class="sourceCode default"><span id="cb51-1"><a href="#cb51-1"></a>01:04:13,000 --&gt; 02:01:01,640 X1:167 X2:267 Y1:33 Y2:63</span></code></pre></div>
+<p>After the index is the start time, end time, and an optional set of points specifying the rectangle the subtitle text should go in.</p>
+<div class="sourceCode" id="cb52"><pre class="sourceCode txt"><code class="sourceCode default"><span id="cb52-1"><a href="#cb52-1"></a>01:04:13,000</span></code></pre></div>
+<p>The timestamp format is <code>hours:minutes:seconds,milliseconds</code>.</p>
+<p><span class="emoji" data-emoji="bulb">💡</span> Note the comma instead of the period separating the seconds from the milliseconds.</p>
+<div class="sourceCode" id="cb53"><pre class="sourceCode txt"><code class="sourceCode default"><span id="cb53-1"><a href="#cb53-1"></a>This is the actual subtitle</span>
+<span id="cb53-2"><a href="#cb53-2"></a>text. It can span multiple lines.</span>
+<span id="cb53-3"><a href="#cb53-3"></a>It may include formating</span>
+<span id="cb53-4"><a href="#cb53-4"></a>like &lt;b&gt;bold&lt;/b&gt;, &lt;i&gt;italic&lt;/i&gt;,</span>
+<span id="cb53-5"><a href="#cb53-5"></a>&lt;u&gt;underline&lt;/u&gt;,</span>
+<span id="cb53-6"><a href="#cb53-6"></a>and &lt;font color=&quot;#010101&quot;&gt;font color&lt;/font&gt;.</span></code></pre></div>
+<p>The third and last part of a block is the subtitle text. It can span multiple lines and ends when there is an empty line. The text can include formatting tags reminiscent of HTML.</p>
+<h3 id="building-the-srt-parser">Building The SRT Parser</h3>
+<span>
+<p align="center">
+<img alt="Parsing SRT" src="https://i.imgur.com/N1qlzd6.jpg">
+<br>
+<sup></sup>
+</p>
+</span>
+
+<div class="sourceCode" id="cb54"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb54-1"><a href="#cb54-1"></a>parseSrt</span>
+<span id="cb54-2"><a href="#cb54-2"></a><span class="ot">  ::</span>  <span class="dt">ReadP</span> [<span class="dt">SrtSubtitle</span>]</span>
+<span id="cb54-3"><a href="#cb54-3"></a>parseSrt</span>
+<span id="cb54-4"><a href="#cb54-4"></a>  <span class="ot">=</span></span>
+<span id="cb54-5"><a href="#cb54-5"></a>  manyTill parseBlock (skipSpaces <span class="op">&gt;&gt;</span> eof)</span></code></pre></div>
+<p><code>parseSrt</code> is the main parser combinator that handles everything. It parses each block until it reaches the end of the file (<code>eof</code>) or input. To be on the safe side, there could be trailing whitespace between the last block and the end of the file. To handle this, it parses zero or more characters of whitespace (<code>skipSpaces</code>) before parsing the end of the file (<code>skipSpaces &gt;&gt; eof</code>). If there is still input left by the time <code>eof</code> is reached, <code>eof</code> will fail and this will return nothing. Therefore, it's important that <code>parseBlock</code> doesn't leave any thing but whitespace behind.</p>
+<h4 id="building-the-srt-block-parser">Building The SRT Block Parser</h4>
+<div class="sourceCode" id="cb55"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb55-1"><a href="#cb55-1"></a>parseBlock</span>
+<span id="cb55-2"><a href="#cb55-2"></a><span class="ot">  ::</span>  <span class="dt">ReadP</span> <span class="dt">SrtSubtitle</span></span>
+<span id="cb55-3"><a href="#cb55-3"></a>parseBlock</span>
+<span id="cb55-4"><a href="#cb55-4"></a>  <span class="ot">=</span> <span class="kw">do</span></span>
+<span id="cb55-5"><a href="#cb55-5"></a>  i      <span class="ot">&lt;-</span> parseIndex</span>
+<span id="cb55-6"><a href="#cb55-6"></a>  (s, e) <span class="ot">&lt;-</span> parseTimestamps</span>
+<span id="cb55-7"><a href="#cb55-7"></a>  c      <span class="ot">&lt;-</span> parseCoordinates</span>
+<span id="cb55-8"><a href="#cb55-8"></a>  t      <span class="ot">&lt;-</span> parseTextLines</span>
+<span id="cb55-9"><a href="#cb55-9"></a>  <span class="fu">return</span></span>
+<span id="cb55-10"><a href="#cb55-10"></a>    <span class="dt">SrtSubtitle</span></span>
+<span id="cb55-11"><a href="#cb55-11"></a>      { <span class="fu">index</span>       <span class="ot">=</span> i</span>
+<span id="cb55-12"><a href="#cb55-12"></a>      , start       <span class="ot">=</span> s</span>
+<span id="cb55-13"><a href="#cb55-13"></a>      , end         <span class="ot">=</span> e</span>
+<span id="cb55-14"><a href="#cb55-14"></a>      , coordinates <span class="ot">=</span> c</span>
+<span id="cb55-15"><a href="#cb55-15"></a>      , taggedText  <span class="ot">=</span> t</span>
+<span id="cb55-16"><a href="#cb55-16"></a>      }</span></code></pre></div>
+<p>As we went over earlier, a block consists of an index, timestamps, possibly some coordinates, and some lines of text. In this version of <code>parseBlock</code>, you see the more imperative do notation style with the record syntax.</p>
+<div class="sourceCode" id="cb56"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb56-1"><a href="#cb56-1"></a>parseBlock&#39;</span>
+<span id="cb56-2"><a href="#cb56-2"></a><span class="ot">  ::</span>  <span class="dt">ReadP</span> <span class="dt">SrtSubtitle</span></span>
+<span id="cb56-3"><a href="#cb56-3"></a>parseBlock&#39;</span>
+<span id="cb56-4"><a href="#cb56-4"></a>  <span class="ot">=</span></span>
+<span id="cb56-5"><a href="#cb56-5"></a>      <span class="dt">SrtSubtitle</span></span>
+<span id="cb56-6"><a href="#cb56-6"></a>  <span class="op">&lt;$&gt;</span> parseIndex</span>
+<span id="cb56-7"><a href="#cb56-7"></a>  <span class="op">&lt;*&gt;</span> parseStartTimestamp</span>
+<span id="cb56-8"><a href="#cb56-8"></a>  <span class="op">&lt;*&gt;</span> parseEndTimestamp</span>
+<span id="cb56-9"><a href="#cb56-9"></a>  <span class="op">&lt;*&gt;</span> parseCoordinates</span>
+<span id="cb56-10"><a href="#cb56-10"></a>  <span class="op">&lt;*&gt;</span> parseTextLines</span></code></pre></div>
+<p>Here's another way you could write <code>parseBlock</code>. This is the applicative style. Just be sure to get the order right. For example, I could've accidentally mixed up the start and end timestamps.</p>
+<h4 id="building-the-srt-index-parser">Building The SRT Index Parser</h4>
+<span>
+<p align="center">
+<img alt="Parsing The Index" src="https://i.imgur.com/bPF76DS.jpg">
+<br>
+<sup></sup>
+</p>
+</span>
+
+<div class="sourceCode" id="cb57"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb57-1"><a href="#cb57-1"></a>parseIndex</span>
+<span id="cb57-2"><a href="#cb57-2"></a><span class="ot">  ::</span>  <span class="dt">ReadP</span> <span class="dt">Int</span></span>
+<span id="cb57-3"><a href="#cb57-3"></a>parseIndex</span>
+<span id="cb57-4"><a href="#cb57-4"></a>  <span class="ot">=</span></span>
+<span id="cb57-5"><a href="#cb57-5"></a>      skipSpaces</span>
+<span id="cb57-6"><a href="#cb57-6"></a>  <span class="op">&gt;&gt;</span>  <span class="fu">readInt</span> <span class="op">&lt;$&gt;</span> parseNumber</span></code></pre></div>
+<p>At the top of the block is the index. Here you see <code>skipSpaces</code> again. After skipping over whitespace, it parses the input for numbers and converts it to an actual integer.</p>
+<div class="sourceCode" id="cb58"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb58-1"><a href="#cb58-1"></a><span class="fu">readInt</span></span>
+<span id="cb58-2"><a href="#cb58-2"></a><span class="ot">  ::</span>  <span class="dt">String</span></span>
+<span id="cb58-3"><a href="#cb58-3"></a>  <span class="ot">-&gt;</span>  <span class="dt">Int</span></span>
+<span id="cb58-4"><a href="#cb58-4"></a><span class="fu">readInt</span></span>
+<span id="cb58-5"><a href="#cb58-5"></a>  <span class="ot">=</span></span>
+<span id="cb58-6"><a href="#cb58-6"></a>  <span class="fu">read</span></span></code></pre></div>
+<p><code>readInt</code> looks like this.</p>
+<div class="sourceCode" id="cb59"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb59-1"><a href="#cb59-1"></a><span class="op">&gt;</span> <span class="fu">read</span> <span class="st">&quot;123&quot;</span><span class="ot"> ::</span> <span class="dt">Int</span></span>
+<span id="cb59-2"><a href="#cb59-2"></a><span class="dv">123</span></span>
+<span id="cb59-3"><a href="#cb59-3"></a><span class="op">&gt;</span> <span class="fu">read</span> <span class="st">&quot;1abc&quot;</span><span class="ot"> ::</span> <span class="dt">Int</span></span>
+<span id="cb59-4"><a href="#cb59-4"></a><span class="op">***</span> <span class="dt">Exception</span><span class="op">:</span> Prelude.read<span class="op">:</span> no parse</span></code></pre></div>
+<p>Normally using <code>read</code> directly can be dangerous. <code>read</code> may not be able to convert the input to the specified type. However, <code>parseNumber</code> will only return the 10 numerical digit characters (<code>['0'..'9']</code>) so using <code>read</code> directly becomes safe.</p>
+<h4 id="building-the-srt-timestamps-parser">Building The SRT Timestamps Parser</h4>
+<span>
+<p align="center">
+<img alt="Parsing The Timestamps" src="https://i.imgur.com/yI3o6NM.jpg">
+<br>
+<sup></sup>
+</p>
+</span>
+
+<p>Parsing the timestamps are a little more involved than parsing the index.</p>
+<div class="sourceCode" id="cb60"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb60-1"><a href="#cb60-1"></a>parseTimestamps</span>
+<span id="cb60-2"><a href="#cb60-2"></a><span class="ot">  ::</span>  <span class="dt">ReadP</span> (<span class="dt">Timestamp</span>, <span class="dt">Timestamp</span>)</span>
+<span id="cb60-3"><a href="#cb60-3"></a>parseTimestamps</span>
+<span id="cb60-4"><a href="#cb60-4"></a>  <span class="ot">=</span> <span class="kw">do</span></span>
+<span id="cb60-5"><a href="#cb60-5"></a>  _   <span class="ot">&lt;-</span> char <span class="ch">&#39;\n&#39;</span></span>
+<span id="cb60-6"><a href="#cb60-6"></a>  s   <span class="ot">&lt;-</span> parseTimestamp</span>
+<span id="cb60-7"><a href="#cb60-7"></a>  _   <span class="ot">&lt;-</span> skipSpaces</span>
+<span id="cb60-8"><a href="#cb60-8"></a>  _   <span class="ot">&lt;-</span> string <span class="st">&quot;--&gt;&quot;</span></span>
+<span id="cb60-9"><a href="#cb60-9"></a>  _   <span class="ot">&lt;-</span> skipSpaces</span>
+<span id="cb60-10"><a href="#cb60-10"></a>  e   <span class="ot">&lt;-</span> parseTimestamp</span>
+<span id="cb60-11"><a href="#cb60-11"></a>  <span class="fu">return</span> (s, e)</span></code></pre></div>
+<p>This is the main combinator for parsing the timestamps.</p>
+<p><code>char</code> parses the character you give it or it fails. If it fails then <code>parseTimestamps</code> fails, ultimately causing <code>parseSrt</code> to fail so there must be a newline character after the index.</p>
+<p><code>string</code> is like <code>char</code> except instead of just one character, it parses the string of characters you give it or it fails.</p>
+<div class="sourceCode" id="cb61"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb61-1"><a href="#cb61-1"></a>parseStartTimestamp</span>
+<span id="cb61-2"><a href="#cb61-2"></a><span class="ot">  ::</span>  <span class="dt">ReadP</span> <span class="dt">Timestamp</span></span>
+<span id="cb61-3"><a href="#cb61-3"></a>parseStartTimestamp</span>
+<span id="cb61-4"><a href="#cb61-4"></a>  <span class="ot">=</span></span>
+<span id="cb61-5"><a href="#cb61-5"></a>      char <span class="ch">&#39;\n&#39;</span></span>
+<span id="cb61-6"><a href="#cb61-6"></a>  <span class="op">&gt;&gt;</span>  parseTimestamp</span></code></pre></div>
+<p><code>parseTimestamps</code> parses both timestamps, but for the applicative style (<code>parseSrt'</code>), we need a parser just for the start timestamp.</p>
+<div class="sourceCode" id="cb62"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb62-1"><a href="#cb62-1"></a>parseEndTimestamp</span>
+<span id="cb62-2"><a href="#cb62-2"></a><span class="ot">  ::</span>  <span class="dt">ReadP</span> <span class="dt">Timestamp</span></span>
+<span id="cb62-3"><a href="#cb62-3"></a>parseEndTimestamp</span>
+<span id="cb62-4"><a href="#cb62-4"></a>  <span class="ot">=</span></span>
+<span id="cb62-5"><a href="#cb62-5"></a>      skipSpaces</span>
+<span id="cb62-6"><a href="#cb62-6"></a>  <span class="op">&gt;&gt;</span>  string <span class="st">&quot;--&gt;&quot;</span></span>
+<span id="cb62-7"><a href="#cb62-7"></a>  <span class="op">&gt;&gt;</span>  skipSpaces</span>
+<span id="cb62-8"><a href="#cb62-8"></a>  <span class="op">&gt;&gt;</span>  parseTimestamp</span></code></pre></div>
+<p>This parses everything between the timestamps and returns the end timestamp.</p>
+<div class="sourceCode" id="cb63"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb63-1"><a href="#cb63-1"></a>parseTimestamp</span>
+<span id="cb63-2"><a href="#cb63-2"></a><span class="ot">  ::</span>  <span class="dt">ReadP</span> <span class="dt">Timestamp</span></span>
+<span id="cb63-3"><a href="#cb63-3"></a>parseTimestamp</span>
+<span id="cb63-4"><a href="#cb63-4"></a>  <span class="ot">=</span> <span class="kw">do</span></span>
+<span id="cb63-5"><a href="#cb63-5"></a>  h  <span class="ot">&lt;-</span> parseNumber</span>
+<span id="cb63-6"><a href="#cb63-6"></a>  _  <span class="ot">&lt;-</span> char <span class="ch">&#39;:&#39;</span></span>
+<span id="cb63-7"><a href="#cb63-7"></a>  m  <span class="ot">&lt;-</span> parseNumber</span>
+<span id="cb63-8"><a href="#cb63-8"></a>  _  <span class="ot">&lt;-</span> char <span class="ch">&#39;:&#39;</span></span>
+<span id="cb63-9"><a href="#cb63-9"></a>  s  <span class="ot">&lt;-</span> parseNumber</span>
+<span id="cb63-10"><a href="#cb63-10"></a>  _  <span class="ot">&lt;-</span> char <span class="ch">&#39;,&#39;</span> <span class="op">&lt;|&gt;</span> char <span class="ch">&#39;.&#39;</span></span>
+<span id="cb63-11"><a href="#cb63-11"></a>  m&#39; <span class="ot">&lt;-</span> parseNumber</span>
+<span id="cb63-12"><a href="#cb63-12"></a>  <span class="fu">return</span></span>
+<span id="cb63-13"><a href="#cb63-13"></a>    <span class="dt">Timestamp</span></span>
+<span id="cb63-14"><a href="#cb63-14"></a>      { hours        <span class="ot">=</span> <span class="fu">readInt</span> h</span>
+<span id="cb63-15"><a href="#cb63-15"></a>      , minutes      <span class="ot">=</span> <span class="fu">readInt</span> m</span>
+<span id="cb63-16"><a href="#cb63-16"></a>      , seconds      <span class="ot">=</span> <span class="fu">readInt</span> s</span>
+<span id="cb63-17"><a href="#cb63-17"></a>      , milliseconds <span class="ot">=</span> <span class="fu">readInt</span> m&#39;</span>
+<span id="cb63-18"><a href="#cb63-18"></a>      }</span></code></pre></div>
+<p>This parses the four numbers that make up the timestamp. The first three numbers are separated by a colon and the last one is separated by a comma. To be more forgiving, however, we allow the possibility of there being a period instead of a comma.</p>
+<div class="sourceCode" id="cb64"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb64-1"><a href="#cb64-1"></a><span class="op">&gt;</span> readP_to_S (char <span class="ch">&#39;.&#39;</span> <span class="op">&lt;|&gt;</span> char <span class="ch">&#39;,&#39;</span>) <span class="st">&quot;...&quot;</span></span>
+<span id="cb64-2"><a href="#cb64-2"></a>[(<span class="ch">&#39;.&#39;</span>,<span class="st">&quot;..&quot;</span>)]</span>
+<span id="cb64-3"><a href="#cb64-3"></a></span>
+<span id="cb64-4"><a href="#cb64-4"></a><span class="op">&gt;</span> readP_to_S (char <span class="ch">&#39;.&#39;</span> <span class="op">&lt;|&gt;</span> char <span class="ch">&#39;,&#39;</span>) <span class="st">&quot;,..&quot;</span></span>
+<span id="cb64-5"><a href="#cb64-5"></a>[(<span class="ch">&#39;,&#39;</span>,<span class="st">&quot;..&quot;</span>)]</span></code></pre></div>
+<p><span class="emoji" data-emoji="bulb">💡</span> Note, when using <code>char</code> with <code>&lt;|&gt;</code>, only one side can succeed (two <code>char</code> enter, one <code>char</code> leave) since <code>char</code> consumes a single character and two characters cannot occupy the same space.</p>
+<h4 id="building-the-srt-coordinates-parser">Building The SRT Coordinates Parser</h4>
+<span>
+<p align="center">
+<img alt="Parsing The Coordinates" src="https://i.imgur.com/0mpO88C.jpg">
+<br>
+<sup></sup>
+</p>
+</span>
+
+<p>The coordinates are an optional part of the block but if included, will be on the same line as the timestamps.</p>
+<div class="sourceCode" id="cb65"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb65-1"><a href="#cb65-1"></a>parseCoordinates</span>
+<span id="cb65-2"><a href="#cb65-2"></a><span class="ot">  ::</span>  <span class="dt">ReadP</span> (<span class="dt">Maybe</span> <span class="dt">SrtSubtitleCoordinates</span>)</span>
+<span id="cb65-3"><a href="#cb65-3"></a>parseCoordinates</span>
+<span id="cb65-4"><a href="#cb65-4"></a>  <span class="ot">=</span></span>
+<span id="cb65-5"><a href="#cb65-5"></a>  option <span class="dt">Nothing</span> <span class="op">$</span> <span class="kw">do</span></span>
+<span id="cb65-6"><a href="#cb65-6"></a>    _  <span class="ot">&lt;-</span> skipSpaces1</span>
+<span id="cb65-7"><a href="#cb65-7"></a>    x1 <span class="ot">&lt;-</span> parseCoordinate <span class="ch">&#39;x&#39;</span> <span class="dv">1</span></span>
+<span id="cb65-8"><a href="#cb65-8"></a>    _  <span class="ot">&lt;-</span> skipSpaces1</span>
+<span id="cb65-9"><a href="#cb65-9"></a>    x2 <span class="ot">&lt;-</span> parseCoordinate <span class="ch">&#39;x&#39;</span> <span class="dv">2</span></span>
+<span id="cb65-10"><a href="#cb65-10"></a>    _  <span class="ot">&lt;-</span> skipSpaces1</span>
+<span id="cb65-11"><a href="#cb65-11"></a>    y1 <span class="ot">&lt;-</span> parseCoordinate <span class="ch">&#39;y&#39;</span> <span class="dv">1</span></span>
+<span id="cb65-12"><a href="#cb65-12"></a>    _  <span class="ot">&lt;-</span> skipSpaces1</span>
+<span id="cb65-13"><a href="#cb65-13"></a>    y2 <span class="ot">&lt;-</span> parseCoordinate <span class="ch">&#39;y&#39;</span> <span class="dv">2</span></span>
+<span id="cb65-14"><a href="#cb65-14"></a>    <span class="fu">return</span></span>
+<span id="cb65-15"><a href="#cb65-15"></a>      <span class="op">$</span> <span class="dt">Just</span></span>
+<span id="cb65-16"><a href="#cb65-16"></a>        <span class="dt">SrtSubtitleCoordinates</span></span>
+<span id="cb65-17"><a href="#cb65-17"></a>          { x1 <span class="ot">=</span> <span class="fu">readInt</span> x1</span>
+<span id="cb65-18"><a href="#cb65-18"></a>          , x2 <span class="ot">=</span> <span class="fu">readInt</span> x2</span>
+<span id="cb65-19"><a href="#cb65-19"></a>          , y1 <span class="ot">=</span> <span class="fu">readInt</span> y1</span>
+<span id="cb65-20"><a href="#cb65-20"></a>          , y2 <span class="ot">=</span> <span class="fu">readInt</span> y2</span>
+<span id="cb65-21"><a href="#cb65-21"></a>          }</span></code></pre></div>
+<p><code>option</code> takes two arguments. The first argument is returned if the second argument, a parser, fails. So if the coordinates parser fails, <code>parseCoordinates</code> will return <code>Nothing</code>. Put another way, the coordinates parser failing does not cause the whole parser to fail. This block will just have <code>Nothing</code> for its <code>coordinates</code> "field".</p>
+<div class="sourceCode" id="cb66"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb66-1"><a href="#cb66-1"></a>parseCoordinate</span>
+<span id="cb66-2"><a href="#cb66-2"></a><span class="ot">  ::</span>  <span class="dt">Char</span></span>
+<span id="cb66-3"><a href="#cb66-3"></a>  <span class="ot">-&gt;</span>  <span class="dt">Int</span></span>
+<span id="cb66-4"><a href="#cb66-4"></a>  <span class="ot">-&gt;</span>  <span class="dt">ReadP</span> <span class="dt">String</span></span>
+<span id="cb66-5"><a href="#cb66-5"></a>parseCoordinate</span>
+<span id="cb66-6"><a href="#cb66-6"></a>  c</span>
+<span id="cb66-7"><a href="#cb66-7"></a>  n</span>
+<span id="cb66-8"><a href="#cb66-8"></a>  <span class="ot">=</span> <span class="kw">do</span></span>
+<span id="cb66-9"><a href="#cb66-9"></a>  _  <span class="ot">&lt;-</span> char (Data.Char.toUpper c) <span class="op">&lt;|&gt;</span> char (Data.Char.toLower c)</span>
+<span id="cb66-10"><a href="#cb66-10"></a>  _  <span class="ot">&lt;-</span> string <span class="op">$</span> <span class="fu">show</span> n <span class="op">++</span> <span class="st">&quot;:&quot;</span></span>
+<span id="cb66-11"><a href="#cb66-11"></a>  parseNumber</span></code></pre></div>
+<p>This parser allows the coordinate labels to be in either uppercase or lowercase. For example, <code>x1:1 X2:2 Y1:3 y2:4</code> would succeed.</p>
+<h4 id="building-the-srt-text-parser">Building The SRT Text Parser</h4>
+<span>
+<p align="center">
+<img alt="Parsing The Text" src="https://i.imgur.com/vMuZsa1.jpg">
+<br>
+<sup></sup>
+</p>
+</span>
+
+<p>Parsing the text is the most involved portion due to the HTML-like tag formatting.</p>
+<p>Tag parsing can be challenging—just ask anyone who parses them with a regular expression. To make this easier on us—and for the user—we'll use a <a href="https://en.wikipedia.org/wiki/Tag_soup">tag soup</a> kind of approach. The parser will allow unclosed and/or wrongly nested tags. It will also allow any tag and not just <code>b</code>, <code>u</code>, <code>i</code>, and <code>font</code>.</p>
+<div class="sourceCode" id="cb67"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb67-1"><a href="#cb67-1"></a>parseTextLines</span>
+<span id="cb67-2"><a href="#cb67-2"></a><span class="ot">  ::</span>  <span class="dt">ReadP</span> [<span class="dt">TaggedText</span>]</span>
+<span id="cb67-3"><a href="#cb67-3"></a>parseTextLines</span>
+<span id="cb67-4"><a href="#cb67-4"></a>  <span class="ot">=</span></span>
+<span id="cb67-5"><a href="#cb67-5"></a>      char <span class="ch">&#39;\n&#39;</span></span>
+<span id="cb67-6"><a href="#cb67-6"></a>  <span class="op">&gt;&gt;</span>  (getTaggedText <span class="op">&lt;$&gt;</span> manyTill parseAny parseEndOfTextLines)</span></code></pre></div>
+<p>We start out by matching on a newline character. After that, we functor map or fmap (<code>&lt;$&gt;</code>) <code>getTaggedText</code> over the subtitle text characters until we reach the end of the text lines.</p>
+<div class="sourceCode" id="cb68"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb68-1"><a href="#cb68-1"></a>parseEndOfTextLines</span>
+<span id="cb68-2"><a href="#cb68-2"></a><span class="ot">  ::</span>  <span class="dt">ReadP</span> ()</span>
+<span id="cb68-3"><a href="#cb68-3"></a>parseEndOfTextLines</span>
+<span id="cb68-4"><a href="#cb68-4"></a>  <span class="ot">=</span></span>
+<span id="cb68-5"><a href="#cb68-5"></a>  void (string <span class="st">&quot;\n\n&quot;</span>) <span class="op">&lt;|&gt;</span> eof</span></code></pre></div>
+<p>We stop collecting characters (<code>parseAny</code>) when we reach two newline characters or the end of the file. This signals the end of the block.</p>
+<div class="sourceCode" id="cb69"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb69-1"><a href="#cb69-1"></a>getTaggedText</span>
+<span id="cb69-2"><a href="#cb69-2"></a><span class="ot">  ::</span>  <span class="dt">String</span></span>
+<span id="cb69-3"><a href="#cb69-3"></a>  <span class="ot">-&gt;</span>  [<span class="dt">TaggedText</span>]</span>
+<span id="cb69-4"><a href="#cb69-4"></a>getTaggedText</span>
+<span id="cb69-5"><a href="#cb69-5"></a>  s</span>
+<span id="cb69-6"><a href="#cb69-6"></a>  <span class="ot">=</span></span>
+<span id="cb69-7"><a href="#cb69-7"></a>  <span class="fu">fst</span></span>
+<span id="cb69-8"><a href="#cb69-8"></a>    <span class="op">$</span> <span class="fu">foldl</span></span>
+<span id="cb69-9"><a href="#cb69-9"></a>      folder</span>
+<span id="cb69-10"><a href="#cb69-10"></a>      ([], [])</span>
+<span id="cb69-11"><a href="#cb69-11"></a>      parsed</span>
+<span id="cb69-12"><a href="#cb69-12"></a>  <span class="kw">where</span></span></code></pre></div>
+<p><code>getTaggedText</code> folds through the parsed text from left to right, returning the accumulated tagged text.</p>
+<div class="sourceCode" id="cb70"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb70-1"><a href="#cb70-1"></a>    parsed</span>
+<span id="cb70-2"><a href="#cb70-2"></a><span class="ot">      ::</span>  [<span class="dt">String</span>]</span>
+<span id="cb70-3"><a href="#cb70-3"></a>    parsed</span>
+<span id="cb70-4"><a href="#cb70-4"></a>      <span class="ot">=</span></span>
+<span id="cb70-5"><a href="#cb70-5"></a>      <span class="kw">case</span> readP_to_S (parseTaggedText []) s <span class="kw">of</span></span>
+<span id="cb70-6"><a href="#cb70-6"></a>        []      <span class="ot">-&gt;</span> [s]</span>
+<span id="cb70-7"><a href="#cb70-7"></a>        r<span class="op">@</span>(_<span class="op">:</span>_) <span class="ot">-&gt;</span> (<span class="fu">fst</span> <span class="op">.</span> <span class="fu">last</span>) r</span></code></pre></div>
+<p><code>parsed</code> returns a list of one or more strings. It attempts to parse the input text for tags. If that fails, <code>parsed</code> returns the input string inside a list. Otherwise, if <code>parseTaggedText</code> succeeds, <code>parse</code> returns the last possible parsing (<code>(fst . last) r</code>).</p>
+<div class="sourceCode" id="cb71"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb71-1"><a href="#cb71-1"></a>    folder</span>
+<span id="cb71-2"><a href="#cb71-2"></a><span class="ot">      ::</span>  ([<span class="dt">TaggedText</span>], [<span class="dt">Tag</span>])</span>
+<span id="cb71-3"><a href="#cb71-3"></a>      <span class="ot">-&gt;</span>  <span class="dt">String</span></span>
+<span id="cb71-4"><a href="#cb71-4"></a>      <span class="ot">-&gt;</span>  ([<span class="dt">TaggedText</span>], [<span class="dt">Tag</span>])</span>
+<span id="cb71-5"><a href="#cb71-5"></a>    folder</span>
+<span id="cb71-6"><a href="#cb71-6"></a>      (tt, t)</span>
+<span id="cb71-7"><a href="#cb71-7"></a>      x</span>
+<span id="cb71-8"><a href="#cb71-8"></a>      <span class="op">|</span> isTag x   <span class="ot">=</span> (tt, updateTags t x)</span>
+<span id="cb71-9"><a href="#cb71-9"></a>      <span class="op">|</span> <span class="fu">otherwise</span> <span class="ot">=</span> (tt <span class="op">++</span> [<span class="dt">TaggedText</span> { text <span class="ot">=</span> x, tags <span class="ot">=</span> t}], t)</span></code></pre></div>
+<p>As <code>folder</code> moves from left to right, over the parsed strings, it checks if the current string is a tag. If it is a tag, it updates the current set of active tags (<code>t</code>). Otherwise, it appends another tagged piece of text associated with the set of active tags.</p>
+<div class="sourceCode" id="cb72"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb72-1"><a href="#cb72-1"></a>updateTags</span>
+<span id="cb72-2"><a href="#cb72-2"></a><span class="ot">  ::</span>  [<span class="dt">Tag</span>]</span>
+<span id="cb72-3"><a href="#cb72-3"></a>  <span class="ot">-&gt;</span>  <span class="dt">String</span></span>
+<span id="cb72-4"><a href="#cb72-4"></a>  <span class="ot">-&gt;</span>  [<span class="dt">Tag</span>]</span>
+<span id="cb72-5"><a href="#cb72-5"></a>updateTags</span>
+<span id="cb72-6"><a href="#cb72-6"></a>  tags</span>
+<span id="cb72-7"><a href="#cb72-7"></a>  x</span>
+<span id="cb72-8"><a href="#cb72-8"></a>  <span class="op">|</span> isClosingTag x <span class="ot">=</span> remove compare&#39; tags (makeTag x)</span>
+<span id="cb72-9"><a href="#cb72-9"></a>  <span class="op">|</span> isOpeningTag x <span class="ot">=</span> add    compare&#39; tags (makeTag x)</span>
+<span id="cb72-10"><a href="#cb72-10"></a>  <span class="op">|</span> <span class="fu">otherwise</span>      <span class="ot">=</span> tags</span>
+<span id="cb72-11"><a href="#cb72-11"></a>  <span class="kw">where</span></span>
+<span id="cb72-12"><a href="#cb72-12"></a>    compare&#39;</span>
+<span id="cb72-13"><a href="#cb72-13"></a><span class="ot">      ::</span>  <span class="dt">Tag</span></span>
+<span id="cb72-14"><a href="#cb72-14"></a>      <span class="ot">-&gt;</span>  <span class="dt">Tag</span></span>
+<span id="cb72-15"><a href="#cb72-15"></a>      <span class="ot">-&gt;</span>  <span class="dt">Bool</span></span>
+<span id="cb72-16"><a href="#cb72-16"></a>    compare&#39;</span>
+<span id="cb72-17"><a href="#cb72-17"></a>      a</span>
+<span id="cb72-18"><a href="#cb72-18"></a>      b</span>
+<span id="cb72-19"><a href="#cb72-19"></a>      <span class="ot">=</span></span>
+<span id="cb72-20"><a href="#cb72-20"></a>      name a <span class="op">/=</span> name b</span></code></pre></div>
+<p><code>updateTags</code> updates the <code>tags</code> given by either removing or adding the given tag (<code>x</code>) depending on if it is a closing or opening tag. If it is neither, it just returns the passed set of tags. <code>add</code> will overwrite an existing tag if <code>tags</code> already has a tag by the same name. You can see this in the <code>compare'</code> function given.</p>
+<p>To keep the parser simple, if an opening tag <code>T</code> is found, <code>T</code> gets added to the list of tags or overwrites an exiting <code>T</code> if already present. If a corresponding closing <code>/T</code> is found, then <code>T</code> is removed from the list of tags, if present. It doesn't matter if there is two or more <code>T</code>s in a row, one or more <code>T</code>s without a closing <code>/T</code>, and/or there's a closing <code>/T</code> without an opening <code>T</code>.</p>
+<div class="sourceCode" id="cb73"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb73-1"><a href="#cb73-1"></a>makeTag</span>
+<span id="cb73-2"><a href="#cb73-2"></a><span class="ot">  ::</span>  <span class="dt">String</span></span>
+<span id="cb73-3"><a href="#cb73-3"></a>  <span class="ot">-&gt;</span>  <span class="dt">Tag</span></span>
+<span id="cb73-4"><a href="#cb73-4"></a>makeTag</span>
+<span id="cb73-5"><a href="#cb73-5"></a>  s</span>
+<span id="cb73-6"><a href="#cb73-6"></a>  <span class="ot">=</span></span>
+<span id="cb73-7"><a href="#cb73-7"></a>  <span class="dt">Tag</span></span>
+<span id="cb73-8"><a href="#cb73-8"></a>    { name       <span class="ot">=</span> getTagName       s</span>
+<span id="cb73-9"><a href="#cb73-9"></a>    , attributes <span class="ot">=</span> getTagAttributes s</span>
+<span id="cb73-10"><a href="#cb73-10"></a>    }</span></code></pre></div>
+<p><code>makeTag</code> assembles a tag from the given string (<code>s</code>). Each <code>Tag</code> has a name and zero or more attributes.</p>
+<div class="sourceCode" id="cb74"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb74-1"><a href="#cb74-1"></a>parseTaggedText</span>
+<span id="cb74-2"><a href="#cb74-2"></a><span class="ot">  ::</span>  [<span class="dt">String</span>]</span>
+<span id="cb74-3"><a href="#cb74-3"></a>  <span class="ot">-&gt;</span>  <span class="dt">ReadP</span> [<span class="dt">String</span>]</span>
+<span id="cb74-4"><a href="#cb74-4"></a>parseTaggedText</span>
+<span id="cb74-5"><a href="#cb74-5"></a>  strings</span>
+<span id="cb74-6"><a href="#cb74-6"></a>  <span class="ot">=</span> <span class="kw">do</span></span>
+<span id="cb74-7"><a href="#cb74-7"></a>  s <span class="ot">&lt;-</span> look</span>
+<span id="cb74-8"><a href="#cb74-8"></a>  <span class="kw">case</span> s <span class="kw">of</span></span>
+<span id="cb74-9"><a href="#cb74-9"></a>    <span class="st">&quot;&quot;</span> <span class="ot">-&gt;</span> <span class="fu">return</span> strings</span>
+<span id="cb74-10"><a href="#cb74-10"></a>    _  <span class="ot">-&gt;</span> <span class="kw">do</span></span>
+<span id="cb74-11"><a href="#cb74-11"></a>      r <span class="ot">&lt;-</span> munch1 (<span class="op">/=</span> <span class="ch">&#39;&lt;&#39;</span>) <span class="op">&lt;++</span> parseClosingTag <span class="op">&lt;++</span> parseOpeningTag</span>
+<span id="cb74-12"><a href="#cb74-12"></a>      parseTaggedText <span class="op">$</span> strings <span class="op">++</span> [r]</span></code></pre></div>
+<p><code>parseTaggedText</code> returns the input string broken up into pieces. Each piece is either the text enclosed by tags, a closing tag, or an opening tag. After it splits off a piece, it adds it to the other pieces and calls itself again. If the remaining input string is empty, it returns the list of strings found.</p>
+<div class="sourceCode" id="cb75"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb75-1"><a href="#cb75-1"></a><span class="op">&gt;</span> readP_to_S (string <span class="st">&quot;ab&quot;</span> <span class="op">&lt;++</span> string <span class="st">&quot;abc&quot;</span>) <span class="st">&quot;abcd&quot;</span></span>
+<span id="cb75-2"><a href="#cb75-2"></a>[(<span class="st">&quot;ab&quot;</span>,<span class="st">&quot;cd&quot;</span>)]</span>
+<span id="cb75-3"><a href="#cb75-3"></a></span>
+<span id="cb75-4"><a href="#cb75-4"></a><span class="op">&gt;</span> readP_to_S (string <span class="st">&quot;ab&quot;</span> <span class="op">+++</span> string <span class="st">&quot;abc&quot;</span>) <span class="st">&quot;abcd&quot;</span></span>
+<span id="cb75-5"><a href="#cb75-5"></a>[(<span class="st">&quot;ab&quot;</span>,<span class="st">&quot;cd&quot;</span>),(<span class="st">&quot;abc&quot;</span>,<span class="st">&quot;d&quot;</span>)]</span>
+<span id="cb75-6"><a href="#cb75-6"></a></span>
+<span id="cb75-7"><a href="#cb75-7"></a><span class="op">&gt;</span> readP_to_S (string <span class="st">&quot;ab&quot;</span> <span class="op">&lt;|&gt;</span> string <span class="st">&quot;abc&quot;</span>) <span class="st">&quot;abcd&quot;</span></span>
+<span id="cb75-8"><a href="#cb75-8"></a>[(<span class="st">&quot;ab&quot;</span>,<span class="st">&quot;cd&quot;</span>),(<span class="st">&quot;abc&quot;</span>,<span class="st">&quot;d&quot;</span>)]</span></code></pre></div>
+<p>The <code>&lt;++</code> operator is left biased meaning that if the left side succeeds, it won't even bother with the right. Recall that when we run the parser, we get a list of all the possible parsings. All of these possible parsings are the result of the parser having traveled through all of the possible paths. By using <code>&lt;++</code>, we receive the possible parsings from the left path and from the right path if and only if the left side failed. If you'd like all of the possible parsings through the left and right side, you can use the <code>+++</code> operator provided by <code>ReadP</code>. <code>+++</code> is just <code>&lt;|&gt;</code> which we saw up above.</p>
+<div class="sourceCode" id="cb76"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb76-1"><a href="#cb76-1"></a>parseOpeningTag</span>
+<span id="cb76-2"><a href="#cb76-2"></a><span class="ot">  ::</span>  <span class="dt">ReadP</span> <span class="dt">String</span></span>
+<span id="cb76-3"><a href="#cb76-3"></a>parseOpeningTag</span>
+<span id="cb76-4"><a href="#cb76-4"></a>  <span class="ot">=</span> <span class="kw">do</span></span>
+<span id="cb76-5"><a href="#cb76-5"></a>  _ <span class="ot">&lt;-</span> char <span class="ch">&#39;&lt;&#39;</span></span>
+<span id="cb76-6"><a href="#cb76-6"></a>  t <span class="ot">&lt;-</span> munch1 (\ c <span class="ot">-&gt;</span> c <span class="op">/=</span> <span class="ch">&#39;/&#39;</span> <span class="op">&amp;&amp;</span> c <span class="op">/=</span> <span class="ch">&#39;&gt;&#39;</span>)</span>
+<span id="cb76-7"><a href="#cb76-7"></a>  _ <span class="ot">&lt;-</span> char <span class="ch">&#39;&gt;&#39;</span></span>
+<span id="cb76-8"><a href="#cb76-8"></a>  <span class="fu">return</span> <span class="op">$</span> <span class="st">&quot;&lt;&quot;</span> <span class="op">++</span> t <span class="op">++</span> <span class="st">&quot;&gt;&quot;</span></span></code></pre></div>
+<p>An opening tag is an opening angle bracket, some text that doesn't include a forward slash, and the next immediate closing angle bracket.</p>
+<div class="sourceCode" id="cb77"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb77-1"><a href="#cb77-1"></a>parseClosingTag</span>
+<span id="cb77-2"><a href="#cb77-2"></a><span class="ot">  ::</span>  <span class="dt">ReadP</span> <span class="dt">String</span></span>
+<span id="cb77-3"><a href="#cb77-3"></a>parseClosingTag</span>
+<span id="cb77-4"><a href="#cb77-4"></a>  <span class="ot">=</span> <span class="kw">do</span></span>
+<span id="cb77-5"><a href="#cb77-5"></a>  _ <span class="ot">&lt;-</span> char <span class="ch">&#39;&lt;&#39;</span></span>
+<span id="cb77-6"><a href="#cb77-6"></a>  _ <span class="ot">&lt;-</span> char <span class="ch">&#39;/&#39;</span></span>
+<span id="cb77-7"><a href="#cb77-7"></a>  t <span class="ot">&lt;-</span> munch1 (<span class="op">/=</span> <span class="ch">&#39;&gt;&#39;</span>)</span>
+<span id="cb77-8"><a href="#cb77-8"></a>  _ <span class="ot">&lt;-</span> char <span class="ch">&#39;&gt;&#39;</span></span>
+<span id="cb77-9"><a href="#cb77-9"></a>  <span class="fu">return</span> <span class="op">$</span> <span class="st">&quot;&lt;/&quot;</span> <span class="op">++</span> t <span class="op">++</span> <span class="st">&quot;&gt;&quot;</span></span></code></pre></div>
+<p>A closing tag is an opening angle bracket, a forward slash, some text, and the next immediate closing angle bracket.</p>
+<span>
+<p align="center">
+<img alt="Parsing Tags" src="https://i.imgur.com/5HJWKPA.jpg">
+<br>
+<sup></sup>
+</p>
+</span>
+
+<div class="sourceCode" id="cb78"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb78-1"><a href="#cb78-1"></a>getTagAttributes</span>
+<span id="cb78-2"><a href="#cb78-2"></a><span class="ot">  ::</span>  <span class="dt">String</span></span>
+<span id="cb78-3"><a href="#cb78-3"></a>  <span class="ot">-&gt;</span>  [<span class="dt">TagAttribute</span>]</span>
+<span id="cb78-4"><a href="#cb78-4"></a>getTagAttributes</span>
+<span id="cb78-5"><a href="#cb78-5"></a>  s</span>
+<span id="cb78-6"><a href="#cb78-6"></a>  <span class="ot">=</span></span>
+<span id="cb78-7"><a href="#cb78-7"></a>  <span class="kw">if</span> isOpeningTag s</span>
+<span id="cb78-8"><a href="#cb78-8"></a>    <span class="kw">then</span></span>
+<span id="cb78-9"><a href="#cb78-9"></a>      <span class="kw">case</span> readP_to_S (parseTagAttributes []) s <span class="kw">of</span></span>
+<span id="cb78-10"><a href="#cb78-10"></a>        []    <span class="ot">-&gt;</span> []</span>
+<span id="cb78-11"><a href="#cb78-11"></a>        (x<span class="op">:</span>_) <span class="ot">-&gt;</span> <span class="fu">fst</span> x</span>
+<span id="cb78-12"><a href="#cb78-12"></a>    <span class="kw">else</span></span>
+<span id="cb78-13"><a href="#cb78-13"></a>      []</span></code></pre></div>
+<p>Opening tags can have attributes. For example, <code>&lt;font color="#101010"&gt;</code>. Each attribute is a two-tuple, key-value pair. In the above example, <code>color</code> would be the key and <code>#101010</code> would be the value.</p>
+<div class="sourceCode" id="cb79"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb79-1"><a href="#cb79-1"></a>getTagName</span>
+<span id="cb79-2"><a href="#cb79-2"></a><span class="ot">  ::</span>  <span class="dt">String</span></span>
+<span id="cb79-3"><a href="#cb79-3"></a>  <span class="ot">-&gt;</span>  <span class="dt">String</span></span>
+<span id="cb79-4"><a href="#cb79-4"></a>getTagName</span>
+<span id="cb79-5"><a href="#cb79-5"></a>  s</span>
+<span id="cb79-6"><a href="#cb79-6"></a>  <span class="ot">=</span></span>
+<span id="cb79-7"><a href="#cb79-7"></a>  <span class="kw">case</span> readP_to_S parseTagName s <span class="kw">of</span></span>
+<span id="cb79-8"><a href="#cb79-8"></a>    []    <span class="ot">-&gt;</span> <span class="st">&quot;&quot;</span></span>
+<span id="cb79-9"><a href="#cb79-9"></a>    (x<span class="op">:</span>_) <span class="ot">-&gt;</span> toLower&#39; <span class="op">$</span> <span class="fu">fst</span> x</span></code></pre></div>
+<p>This returns the tag name in lowercase.</p>
+<div class="sourceCode" id="cb80"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb80-1"><a href="#cb80-1"></a>parseTagName</span>
+<span id="cb80-2"><a href="#cb80-2"></a><span class="ot">  ::</span>  <span class="dt">ReadP</span> <span class="dt">String</span></span>
+<span id="cb80-3"><a href="#cb80-3"></a>parseTagName</span>
+<span id="cb80-4"><a href="#cb80-4"></a>  <span class="ot">=</span> <span class="kw">do</span></span>
+<span id="cb80-5"><a href="#cb80-5"></a>  _ <span class="ot">&lt;-</span> char <span class="ch">&#39;&lt;&#39;</span></span>
+<span id="cb80-6"><a href="#cb80-6"></a>  _ <span class="ot">&lt;-</span> munch (<span class="op">==</span> <span class="ch">&#39;/&#39;</span>)</span>
+<span id="cb80-7"><a href="#cb80-7"></a>  _ <span class="ot">&lt;-</span> skipSpaces</span>
+<span id="cb80-8"><a href="#cb80-8"></a>  n <span class="ot">&lt;-</span> munch1 (\ c <span class="ot">-&gt;</span> c <span class="op">/=</span> <span class="ch">&#39; &#39;</span> <span class="op">&amp;&amp;</span> c <span class="op">/=</span> <span class="ch">&#39;&gt;&#39;</span>)</span>
+<span id="cb80-9"><a href="#cb80-9"></a>  _ <span class="ot">&lt;-</span> munch  (<span class="op">/=</span> <span class="ch">&#39;&gt;&#39;</span>)</span>
+<span id="cb80-10"><a href="#cb80-10"></a>  _ <span class="ot">&lt;-</span> char <span class="ch">&#39;&gt;&#39;</span></span>
+<span id="cb80-11"><a href="#cb80-11"></a>  <span class="fu">return</span> n</span></code></pre></div>
+<p>The tag name is the first string of non-whitespace characters after the opening angle bracket, a possible forward slash, and some possible whitespace and before some more whitespace and/or the closing angle bracket.</p>
+<div class="sourceCode" id="cb81"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb81-1"><a href="#cb81-1"></a>parseTagAttributes</span>
+<span id="cb81-2"><a href="#cb81-2"></a><span class="ot">  ::</span>  [<span class="dt">TagAttribute</span>]</span>
+<span id="cb81-3"><a href="#cb81-3"></a>  <span class="ot">-&gt;</span>  <span class="dt">ReadP</span> [<span class="dt">TagAttribute</span>]</span>
+<span id="cb81-4"><a href="#cb81-4"></a>parseTagAttributes</span>
+<span id="cb81-5"><a href="#cb81-5"></a>  tagAttributes</span>
+<span id="cb81-6"><a href="#cb81-6"></a>  <span class="ot">=</span> <span class="kw">do</span></span>
+<span id="cb81-7"><a href="#cb81-7"></a>  s <span class="ot">&lt;-</span> look</span>
+<span id="cb81-8"><a href="#cb81-8"></a>  <span class="kw">case</span> s <span class="kw">of</span></span>
+<span id="cb81-9"><a href="#cb81-9"></a>    <span class="st">&quot;&quot;</span> <span class="ot">-&gt;</span> <span class="fu">return</span> tagAttributes</span>
+<span id="cb81-10"><a href="#cb81-10"></a>    _  <span class="ot">-&gt;</span> <span class="kw">do</span></span>
+<span id="cb81-11"><a href="#cb81-11"></a>      <span class="kw">let</span> h <span class="ot">=</span> <span class="fu">head</span> s</span>
+<span id="cb81-12"><a href="#cb81-12"></a>      <span class="kw">case</span> h <span class="kw">of</span></span>
+<span id="cb81-13"><a href="#cb81-13"></a>        <span class="ch">&#39;&gt;&#39;</span> <span class="ot">-&gt;</span> <span class="fu">return</span> tagAttributes</span>
+<span id="cb81-14"><a href="#cb81-14"></a>        <span class="ch">&#39;&lt;&#39;</span> <span class="ot">-&gt;</span> trimTagname <span class="op">&gt;&gt;</span> parseTagAttributes&#39;</span>
+<span id="cb81-15"><a href="#cb81-15"></a>        _   <span class="ot">-&gt;</span> parseTagAttributes&#39;</span>
+<span id="cb81-16"><a href="#cb81-16"></a>  <span class="kw">where</span></span>
+<span id="cb81-17"><a href="#cb81-17"></a>    parseTagAttributes&#39;</span>
+<span id="cb81-18"><a href="#cb81-18"></a><span class="ot">      ::</span>  <span class="dt">ReadP</span> [<span class="dt">TagAttribute</span>]</span>
+<span id="cb81-19"><a href="#cb81-19"></a>    parseTagAttributes&#39;</span>
+<span id="cb81-20"><a href="#cb81-20"></a>      <span class="ot">=</span> <span class="kw">do</span></span>
+<span id="cb81-21"><a href="#cb81-21"></a>      tagAttribute <span class="ot">&lt;-</span> parseTagAttribute</span>
+<span id="cb81-22"><a href="#cb81-22"></a>      parseTagAttributes</span>
+<span id="cb81-23"><a href="#cb81-23"></a>        ( add</span>
+<span id="cb81-24"><a href="#cb81-24"></a>            (\ a b <span class="ot">-&gt;</span> <span class="fu">fst</span> a <span class="op">/=</span> <span class="fu">fst</span> b)</span>
+<span id="cb81-25"><a href="#cb81-25"></a>            tagAttributes</span>
+<span id="cb81-26"><a href="#cb81-26"></a>            tagAttribute</span>
+<span id="cb81-27"><a href="#cb81-27"></a>        )</span></code></pre></div>
+<p><code>parseTagAttributes</code> recursively goes through the input string, collecting up the key-value pairs. At the start of the tag (<code>&lt;</code>), it first trims the tag name before tackling the attributes. It stops parsing for attributes when it reaches the closing angle bracket (<code>&gt;</code>). If a tag happens to have duplicate attributes (based on the key), <code>add</code> will ensure only the latest one remains in the list.</p>
+<div class="sourceCode" id="cb82"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb82-1"><a href="#cb82-1"></a>trimTagname</span>
+<span id="cb82-2"><a href="#cb82-2"></a><span class="ot">  ::</span> <span class="dt">ReadP</span> ()</span>
+<span id="cb82-3"><a href="#cb82-3"></a>trimTagname</span>
+<span id="cb82-4"><a href="#cb82-4"></a>  <span class="ot">=</span></span>
+<span id="cb82-5"><a href="#cb82-5"></a>      char <span class="ch">&#39;&lt;&#39;</span></span>
+<span id="cb82-6"><a href="#cb82-6"></a>  <span class="op">&gt;&gt;</span> skipSpaces</span>
+<span id="cb82-7"><a href="#cb82-7"></a>  <span class="op">&gt;&gt;</span> munch1 (\ c <span class="ot">-&gt;</span> c <span class="op">/=</span> <span class="ch">&#39; &#39;</span> <span class="op">&amp;&amp;</span> c <span class="op">/=</span> <span class="ch">&#39;&gt;&#39;</span>)</span>
+<span id="cb82-8"><a href="#cb82-8"></a>  <span class="op">&gt;&gt;</span> <span class="fu">return</span> ()</span></code></pre></div>
+<p>This trims or discards the tag name.</p>
+<div class="sourceCode" id="cb83"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb83-1"><a href="#cb83-1"></a>parseTagAttribute</span>
+<span id="cb83-2"><a href="#cb83-2"></a><span class="ot">  ::</span>  <span class="dt">ReadP</span> <span class="dt">TagAttribute</span></span>
+<span id="cb83-3"><a href="#cb83-3"></a>parseTagAttribute</span>
+<span id="cb83-4"><a href="#cb83-4"></a>  <span class="ot">=</span> <span class="kw">do</span></span>
+<span id="cb83-5"><a href="#cb83-5"></a>  _ <span class="ot">&lt;-</span> skipSpaces</span>
+<span id="cb83-6"><a href="#cb83-6"></a>  k <span class="ot">&lt;-</span> munch1 (<span class="op">/=</span> <span class="ch">&#39;=&#39;</span>)</span>
+<span id="cb83-7"><a href="#cb83-7"></a>  _ <span class="ot">&lt;-</span> string <span class="st">&quot;=\&quot;&quot;</span></span>
+<span id="cb83-8"><a href="#cb83-8"></a>  v <span class="ot">&lt;-</span> munch1 (<span class="op">/=</span> <span class="ch">&#39;\&quot;&#39;</span>)</span>
+<span id="cb83-9"><a href="#cb83-9"></a>  _ <span class="ot">&lt;-</span> char <span class="ch">&#39;\&quot;&#39;</span></span>
+<span id="cb83-10"><a href="#cb83-10"></a>  _ <span class="ot">&lt;-</span> skipSpaces</span>
+<span id="cb83-11"><a href="#cb83-11"></a>  <span class="fu">return</span> (toLower&#39; k, v)</span></code></pre></div>
+<p>The attribute key is any string of non-whitespace characters before the equal sign. The attribute value is any characters after the equal sign and double quote and before the next immediate double quote.</p>
+<div class="sourceCode" id="cb84"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb84-1"><a href="#cb84-1"></a>isTag</span>
+<span id="cb84-2"><a href="#cb84-2"></a><span class="ot">  ::</span>  <span class="dt">String</span></span>
+<span id="cb84-3"><a href="#cb84-3"></a>  <span class="ot">-&gt;</span>  <span class="dt">Bool</span></span>
+<span id="cb84-4"><a href="#cb84-4"></a>isTag</span>
+<span id="cb84-5"><a href="#cb84-5"></a>  s</span>
+<span id="cb84-6"><a href="#cb84-6"></a>  <span class="ot">=</span></span>
+<span id="cb84-7"><a href="#cb84-7"></a>  isOpeningTag s <span class="op">||</span> isClosingTag s</span></code></pre></div>
+<p>A string is a tag if it is either an opening tag or a closing tag.</p>
+<div class="sourceCode" id="cb85"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb85-1"><a href="#cb85-1"></a>isOpeningTag</span>
+<span id="cb85-2"><a href="#cb85-2"></a><span class="ot">  ::</span>  <span class="dt">String</span></span>
+<span id="cb85-3"><a href="#cb85-3"></a>  <span class="ot">-&gt;</span>  <span class="dt">Bool</span></span>
+<span id="cb85-4"><a href="#cb85-4"></a>isOpeningTag</span>
+<span id="cb85-5"><a href="#cb85-5"></a>  s</span>
+<span id="cb85-6"><a href="#cb85-6"></a>  <span class="ot">=</span></span>
+<span id="cb85-7"><a href="#cb85-7"></a>  isPresent <span class="op">$</span> readP_to_S parseOpeningTag s</span></code></pre></div>
+<p>A string is an opening tag if the opening tag parser succeeds.</p>
+<div class="sourceCode" id="cb86"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb86-1"><a href="#cb86-1"></a>isClosingTag</span>
+<span id="cb86-2"><a href="#cb86-2"></a><span class="ot">  ::</span>  <span class="dt">String</span></span>
+<span id="cb86-3"><a href="#cb86-3"></a>  <span class="ot">-&gt;</span>  <span class="dt">Bool</span></span>
+<span id="cb86-4"><a href="#cb86-4"></a>isClosingTag</span>
+<span id="cb86-5"><a href="#cb86-5"></a>  s</span>
+<span id="cb86-6"><a href="#cb86-6"></a>  <span class="ot">=</span></span>
+<span id="cb86-7"><a href="#cb86-7"></a>  isPresent <span class="op">$</span> readP_to_S parseClosingTag s</span></code></pre></div>
+<p>A string is a closing tag if the closing tag parser succeeds.</p>
+<h3 id="running-the-srt-parser">Running The SRT Parser</h3>
+<span>
+<p align="center">
+<img alt="Parsed SRT Results" src="https://i.imgur.com/owAu628.jpg">
+<br>
+<sup></sup>
+</p>
+</span>
+
+<p>Now that we've assembled the parser, let's try it out.</p>
+<div class="sourceCode" id="cb87"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb87-1"><a href="#cb87-1"></a><span class="op">&gt;</span> <span class="kw">let</span> srt <span class="ot">=</span></span>
+<span id="cb87-2"><a href="#cb87-2"></a><span class="op">&gt;</span>       <span class="st">&quot; 1\n\</span></span>
+<span id="cb87-3"><a href="#cb87-3"></a><span class="st">&gt;       \0:0:0,1 --&gt; 0:1:0.2  x1:1 X2:3  y1:4 y2:10\n\</span></span>
+<span id="cb87-4"><a href="#cb87-4"></a><span class="st">&gt;       \&lt;font color=\&quot;red\&quot; color=\&quot;blue\&quot;&gt;This is some &lt;b&gt;&lt;u&gt;&lt;i&gt;\n \</span></span>
+<span id="cb87-5"><a href="#cb87-5"></a><span class="st">&gt;       \subtitle \n\</span></span>
+<span id="cb87-6"><a href="#cb87-6"></a><span class="st">&gt;       \&lt;/u&gt;text.&lt;/b&gt;  &quot;</span></span>
+<span id="cb87-7"><a href="#cb87-7"></a><span class="op">&gt;</span> readP_to_S parseSrt srt</span>
+<span id="cb87-8"><a href="#cb87-8"></a>[([ <span class="dt">SrtSubtitle</span></span>
+<span id="cb87-9"><a href="#cb87-9"></a>      { <span class="fu">index</span> <span class="ot">=</span> <span class="dv">1</span></span>
+<span id="cb87-10"><a href="#cb87-10"></a>      , start <span class="ot">=</span> <span class="dt">Timestamp</span> {hours <span class="ot">=</span> <span class="dv">0</span>, minutes <span class="ot">=</span> <span class="dv">0</span>, seconds <span class="ot">=</span> <span class="dv">0</span>, milliseconds <span class="ot">=</span> <span class="dv">1</span>}</span>
+<span id="cb87-11"><a href="#cb87-11"></a>      , end   <span class="ot">=</span> <span class="dt">Timestamp</span> {hours <span class="ot">=</span> <span class="dv">0</span>, minutes <span class="ot">=</span> <span class="dv">1</span>, seconds <span class="ot">=</span> <span class="dv">0</span>, milliseconds <span class="ot">=</span> <span class="dv">2</span>}</span>
+<span id="cb87-12"><a href="#cb87-12"></a>      , coordinates <span class="ot">=</span> <span class="dt">Just</span> (<span class="dt">SrtSubtitleCoordinates</span> {x1 <span class="ot">=</span> <span class="dv">1</span>, x2 <span class="ot">=</span> <span class="dv">3</span>, y1 <span class="ot">=</span> <span class="dv">4</span>, y2 <span class="ot">=</span> <span class="dv">10</span>})</span>
+<span id="cb87-13"><a href="#cb87-13"></a>      , taggedText <span class="ot">=</span>  [ <span class="dt">TaggedText</span></span>
+<span id="cb87-14"><a href="#cb87-14"></a>                        { text <span class="ot">=</span> <span class="st">&quot;This is some &quot;</span></span>
+<span id="cb87-15"><a href="#cb87-15"></a>                        , tags <span class="ot">=</span> [ <span class="dt">Tag</span> {name <span class="ot">=</span> <span class="st">&quot;font&quot;</span>, attributes <span class="ot">=</span> [(<span class="st">&quot;color&quot;</span>,<span class="st">&quot;blue&quot;</span>)]}</span>
+<span id="cb87-16"><a href="#cb87-16"></a>                                 ]</span>
+<span id="cb87-17"><a href="#cb87-17"></a>                        }</span>
+<span id="cb87-18"><a href="#cb87-18"></a>                      , <span class="dt">TaggedText</span></span>
+<span id="cb87-19"><a href="#cb87-19"></a>                          { text <span class="ot">=</span> <span class="st">&quot;\n subtitle \n&quot;</span></span>
+<span id="cb87-20"><a href="#cb87-20"></a>                          , tags <span class="ot">=</span> [ <span class="dt">Tag</span> {name <span class="ot">=</span> <span class="st">&quot;font&quot;</span>, attributes <span class="ot">=</span> [(<span class="st">&quot;color&quot;</span>,<span class="st">&quot;blue&quot;</span>)]}</span>
+<span id="cb87-21"><a href="#cb87-21"></a>                                   , <span class="dt">Tag</span> {name <span class="ot">=</span> <span class="st">&quot;b&quot;</span>,    attributes <span class="ot">=</span> []}</span>
+<span id="cb87-22"><a href="#cb87-22"></a>                                   , <span class="dt">Tag</span> {name <span class="ot">=</span> <span class="st">&quot;u&quot;</span>,    attributes <span class="ot">=</span> []}</span>
+<span id="cb87-23"><a href="#cb87-23"></a>                                   , <span class="dt">Tag</span> {name <span class="ot">=</span> <span class="st">&quot;i&quot;</span>,    attributes <span class="ot">=</span> []}</span>
+<span id="cb87-24"><a href="#cb87-24"></a>                                   ]</span>
+<span id="cb87-25"><a href="#cb87-25"></a>                          }</span>
+<span id="cb87-26"><a href="#cb87-26"></a>                      , <span class="dt">TaggedText</span></span>
+<span id="cb87-27"><a href="#cb87-27"></a>                          { text <span class="ot">=</span> <span class="st">&quot;text.&quot;</span></span>
+<span id="cb87-28"><a href="#cb87-28"></a>                          , tags <span class="ot">=</span> [ <span class="dt">Tag</span> {name <span class="ot">=</span> <span class="st">&quot;font&quot;</span>, attributes <span class="ot">=</span> [(<span class="st">&quot;color&quot;</span>,<span class="st">&quot;blue&quot;</span>)]}</span>
+<span id="cb87-29"><a href="#cb87-29"></a>                                   , <span class="dt">Tag</span> {name <span class="ot">=</span> <span class="st">&quot;b&quot;</span>,    attributes <span class="ot">=</span> []}</span>
+<span id="cb87-30"><a href="#cb87-30"></a>                                   , <span class="dt">Tag</span> {name <span class="ot">=</span> <span class="st">&quot;i&quot;</span>,    attributes <span class="ot">=</span> []}</span>
+<span id="cb87-31"><a href="#cb87-31"></a>                                   ]</span>
+<span id="cb87-32"><a href="#cb87-32"></a>                          }</span>
+<span id="cb87-33"><a href="#cb87-33"></a>                      , <span class="dt">TaggedText</span></span>
+<span id="cb87-34"><a href="#cb87-34"></a>                          { text <span class="ot">=</span> <span class="st">&quot;  &quot;</span></span>
+<span id="cb87-35"><a href="#cb87-35"></a>                          , tags <span class="ot">=</span> [ <span class="dt">Tag</span> {name <span class="ot">=</span> <span class="st">&quot;font&quot;</span>, attributes <span class="ot">=</span> [(<span class="st">&quot;color&quot;</span>,<span class="st">&quot;blue&quot;</span>)]}</span>
+<span id="cb87-36"><a href="#cb87-36"></a>                                   , <span class="dt">Tag</span> {name <span class="ot">=</span> <span class="st">&quot;i&quot;</span>,    attributes <span class="ot">=</span> []}</span>
+<span id="cb87-37"><a href="#cb87-37"></a>                                   ]</span>
+<span id="cb87-38"><a href="#cb87-38"></a>                          }</span>
+<span id="cb87-39"><a href="#cb87-39"></a>                      ]</span>
+<span id="cb87-40"><a href="#cb87-40"></a>      }</span>
+<span id="cb87-41"><a href="#cb87-41"></a>  ]</span>
+<span id="cb87-42"><a href="#cb87-42"></a>, <span class="st">&quot;&quot;</span></span>
+<span id="cb87-43"><a href="#cb87-43"></a>)]</span></code></pre></div>
+<p>Here you see the result of parsing a test string. Notice the errors in the test string like the use of a period instead of a comma or the duplicate tag attribute.</p>
+<h2 id="exercises">Exercises</h2>
+<ul>
+<li>Write a program that can convert an SRT file to a JSON file.</li>
+<li>Rewrite the version number parser using Parsec instead of ReadP.</li>
+<li>Rewrite the SRT parser using Parsec instead of ReadP.</li>
+</ul>
+<h2 id="copyright">Copyright</h2>
+<p>(C) 2019 David Lettier <br> <a href="https://www.lettier.com/">lettier.com</a></p>
+  </body>
+</html>
